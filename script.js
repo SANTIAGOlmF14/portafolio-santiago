@@ -139,30 +139,8 @@ if (heroSub) {
   }, 900);
 }
 
-/* =====================================================================
-   HERO SLIDESHOW — imagen ↔ video en bucle sin parpadeo
-   ---------------------------------------------------------------
-   Estrategia anti-parpadeo:
-
-   FOTO → VIDEO
-   • Se empieza a precargar el video 3 s ANTES de que expire el timer,
-     así el primer frame ya está decodificado cuando llega el momento.
-   • Se espera el evento `seeked` (no solo `canplay`): `seeked` garantiza
-     que el frame en currentTime=0 está pintado en el buffer de la GPU,
-     por lo que al hacer opacity:1 no hay negro inicial.
-   • El CSS tiene will-change:opacity + transform:translateZ(0) para que
-     ambos elementos vivan en su propio layer de GPU: el crossfade es un
-     blend de texturas ya cargadas, sin re-pintar nada en CPU.
-
-   VIDEO → FOTO
-   • La foto siempre está en el DOM con opacity:1 debajo del video,
-     así que en cuanto bajamos la opacidad del video, la foto aparece
-     instantáneamente sin ningún re-render.
-   • NO se limpia video.src al terminar: solo pause() + currentTime=0.
-     Limpiar el src hace que el elemento vuelva a un estado vacío/negro
-     justo cuando el fade empieza, causando el flash. Manteniéndolo
-     cargado ese frame negro nunca aparece.
-   ===================================================================== */
+/* ===== HERO SLIDESHOW =====
+   Foto visible 10 s → fade a video aleatorio → cuando termina, fade de vuelta a foto → repite. */
 (function heroSlideshow() {
   const photo = document.getElementById('hero-photo');
   const video = document.getElementById('hero-video');
@@ -175,120 +153,46 @@ if (heroSub) {
     BASE + 'Media/bien.mp4'
   ];
 
-  // Tiempo que la foto permanece visible antes de intentar el video (ms)
-  const DISPLAY_TIME  = 12000; // 12 s — da margen para la descarga remota
-  // Cuánto antes de DISPLAY_TIME se empieza la precarga (ms)
-  const PRELOAD_AHEAD = 9000;  // 9 s de ventana para descargar desde GitHub LFS
-  // Timeout máximo de espera por `loadeddata` antes de saltarse el clip (ms)
-  const LOAD_TIMEOUT  = 15000;
-
   let lastIndex = -1;
-  let pendingSrc = null;       // src que se preloadea silenciosamente
-  let isTransitioning = false;
 
-  /* ── Elige un índice distinto al anterior ── */
-  function pickIndex() {
-    if (clips.length === 1) return 0;
+  function pickClip() {
     let idx;
-    do { idx = Math.floor(Math.random() * clips.length); } while (idx === lastIndex);
+    do { idx = Math.floor(Math.random() * clips.length); } while (idx === lastIndex && clips.length > 1);
     lastIndex = idx;
-    return idx;
+    return clips[idx];
   }
 
-  /* ── Precarga un clip: asigna src y espera el primer frame.
-     Resuelve cuando readyState >= 2 (HAVE_CURRENT_DATA).
-     Rechaza si hay error o se supera LOAD_TIMEOUT. ── */
-  function preloadClip(src) {
-    return new Promise((resolve, reject) => {
-      // Ya está cargado exactamente este src → solo rebobina
-      if (video.src === src && video.readyState >= 2) {
-        video.currentTime = 0;
-        const onSeeked = () => resolve();
-        video.addEventListener('seeked', onSeeked, { once: true });
-        return;
-      }
+  function showVideo() {
+    const src = pickClip();
+    video.src = src;
+    video.load();
 
-      let timer = setTimeout(() => {
-        video.removeEventListener('loadeddata', onData);
-        video.removeEventListener('error', onErr);
-        reject(new Error('[HeroSlideshow] timeout: ' + src));
-      }, LOAD_TIMEOUT);
+    video.addEventListener('canplay', function onCanPlay() {
+      video.removeEventListener('canplay', onCanPlay);
+      video.play().catch(() => {});
+      video.style.opacity = '1';
+      photo.style.opacity = '0';
+    }, { once: true });
 
-      function cleanup() { clearTimeout(timer); }
+    video.addEventListener('error', function onErr() {
+      video.removeEventListener('error', onErr);
+      backToPhoto();
+    }, { once: true });
 
-      function onData() {
-        cleanup();
-        video.currentTime = 0;
-        video.addEventListener('seeked', () => resolve(), { once: true });
-      }
-      function onErr() {
-        cleanup();
-        reject(new Error('[HeroSlideshow] error cargando: ' + src));
-      }
-
-      video.addEventListener('loadeddata', onData, { once: true });
-      video.addEventListener('error',      onErr,  { once: true });
-      video.src = src;
-      video.load();
-    });
+    video.addEventListener('ended', backToPhoto, { once: true });
   }
 
-  /* ── Crossfade foto → video ── */
-  function crossfadeToVideo() {
-    if (isTransitioning) return;
-    isTransitioning = true;
-
-    // Usa el clip precargado si está listo, o elige uno nuevo
-    const src = (pendingSrc && video.src === pendingSrc && video.readyState >= 2)
-      ? pendingSrc
-      : clips[pickIndex()];
-    pendingSrc = null;
-
-    preloadClip(src)
-      .then(() => {
-        video.play().catch(() => {});
-        video.style.opacity = '1';
-        photo.style.opacity = '0';
-        video.addEventListener('ended', onVideoEnded, { once: true });
-        isTransitioning = false;
-      })
-      .catch(err => {
-        console.warn(err);
-        isTransitioning = false;
-        scheduleNext(); // saltar este clip y volver a la foto
-      });
-  }
-
-  /* ── Video terminó → vuelve a la foto ── */
-  function onVideoEnded() {
+  function backToPhoto() {
     photo.style.opacity = '1';
     video.style.opacity = '0';
     video.pause();
-    // NO limpiamos video.src para evitar flash negro
-    scheduleNext();
+    setTimeout(showVideo, 10000);
   }
 
-  /* ── Programa el próximo ciclo ── */
-  function scheduleNext() {
-    // Precarga silenciosa con PRELOAD_AHEAD de anticipación
-    setTimeout(() => {
-      const idx = pickIndex();
-      pendingSrc = clips[idx];
-      lastIndex  = idx;
-      preloadClip(pendingSrc).catch(() => { pendingSrc = null; });
-    }, DISPLAY_TIME - PRELOAD_AHEAD);
-
-    // Dispara el crossfade al cumplirse DISPLAY_TIME
-    setTimeout(crossfadeToVideo, DISPLAY_TIME);
-  }
-
-  // Arranca
-  scheduleNext();
+  setTimeout(showVideo, 10000);
 })();
 
-/* =====================================================================
-   VIDEO PRESENTACIÓN — Sección "Sobre mí"
-   ===================================================================== */
+/* ===== VIDEO PRESENTACIÓN — Sección "Sobre mí" ===== */
 (function presVideo() {
   const video        = document.getElementById('presentacion-video');
   const overlay      = document.getElementById('play-overlay');
