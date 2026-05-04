@@ -444,6 +444,73 @@
       }
     });
 
+    /* ── Cursor personalizado en fullscreen ── */
+    function onFsChange() {
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+      if (fsEl === wrap) {
+        // Entró en fullscreen: crear cursor clonado dentro del wrap
+        if (wrap.querySelector('.fs-cursor')) return; // ya existe
+
+        const fsCursor = document.createElement('div');
+        fsCursor.className = 'fs-cursor';
+        const fsTrail = document.createElement('div');
+        fsTrail.className = 'fs-trail';
+        wrap.appendChild(fsCursor);
+        wrap.appendChild(fsTrail);
+
+        let fsX = 0, fsY = 0, fsTX = 0, fsTY = 0;
+        let fsRaf = null;
+
+        function onFsMove(e) {
+          fsX = e.clientX; fsY = e.clientY;
+          fsCursor.style.left = fsX + 'px';
+          fsCursor.style.top  = fsY + 'px';
+        }
+
+        function animFs() {
+          fsTX += (fsX - fsTX) * 0.18;
+          fsTY += (fsY - fsTY) * 0.18;
+          fsTrail.style.left = fsTX + 'px';
+          fsTrail.style.top  = fsTY + 'px';
+          fsRaf = requestAnimationFrame(animFs);
+        }
+        fsRaf = requestAnimationFrame(animFs);
+
+        // Agrandar cursor al pasar por controles
+        wrap.querySelectorAll('button, #pres-track').forEach(function(el) {
+          el.addEventListener('mouseenter', function() {
+            fsCursor.style.width  = '20px'; fsCursor.style.height = '20px';
+            fsTrail.style.width   = '60px'; fsTrail.style.height  = '60px';
+          });
+          el.addEventListener('mouseleave', function() {
+            fsCursor.style.width  = '12px'; fsCursor.style.height = '12px';
+            fsTrail.style.width   = '36px'; fsTrail.style.height  = '36px';
+          });
+        });
+
+        document.addEventListener('mousemove', onFsMove);
+
+        // Limpieza al salir de fullscreen
+        function onFsExit() {
+          const stillFs = document.fullscreenElement || document.webkitFullscreenElement;
+          if (!stillFs) {
+            cancelAnimationFrame(fsRaf);
+            document.removeEventListener('mousemove', onFsMove);
+            document.removeEventListener('fullscreenchange', onFsExit);
+            document.removeEventListener('webkitfullscreenchange', onFsExit);
+            const fc = wrap.querySelector('.fs-cursor');
+            const ft = wrap.querySelector('.fs-trail');
+            if (fc) fc.remove();
+            if (ft) ft.remove();
+          }
+        }
+        document.addEventListener('fullscreenchange', onFsExit);
+        document.addEventListener('webkitfullscreenchange', onFsExit);
+      }
+    }
+    document.addEventListener('fullscreenchange', onFsChange);
+    document.addEventListener('webkitfullscreenchange', onFsChange);
+
     /* ── Progress update ── */
     video.addEventListener('timeupdate', updateProg);
     video.addEventListener('loadedmetadata', updateProg);

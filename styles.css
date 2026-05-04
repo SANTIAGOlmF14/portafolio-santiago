@@ -400,14 +400,14 @@ section { position:relative; z-index:1; padding:7rem 4rem; }
   background: #000;
   width: 100vw !important;
   height: 100vh !important;
-  cursor: default;
+  cursor: none !important;
 }
 .presentacion-wrap:-webkit-full-screen video,
 .presentacion-wrap:fullscreen video {
   width: 100vw !important;
   height: 100vh !important;
   object-fit: contain !important;
-  cursor: default;
+  cursor: none !important;
 }
 .presentacion-wrap:-webkit-full-screen #pres-controls,
 .presentacion-wrap:fullscreen #pres-controls {
@@ -416,14 +416,38 @@ section { position:relative; z-index:1; padding:7rem 4rem; }
   left: 0 !important;
   right: 0 !important;
   z-index: 2147483647 !important;
-  cursor: default;
+  cursor: none !important;
 }
 .presentacion-wrap:-webkit-full-screen #pres-controls *,
 .presentacion-wrap:fullscreen #pres-controls * {
-  cursor: default;
+  cursor: none !important;
 }
 .presentacion-wrap:-webkit-full-screen #pres-track,
 .presentacion-wrap:fullscreen #pres-track {
   height: 8px !important;
-  cursor: default;
+  cursor: none !important;
+}
+
+/* Cursor personalizado dentro del fullscreen */
+.fs-cursor {
+  width: 12px; height: 12px;
+  background: var(--accent);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 2147483647;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+  transition: width .2s, height .2s;
+}
+.fs-trail {
+  width: 36px; height: 36px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 2147483646;
+  transform: translate(-50%, -50%);
+  opacity: 0.5;
+  transition: width .2s, height .2s;
 }
