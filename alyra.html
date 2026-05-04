@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Alyra — Modelo 3D Original | SLM</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    /* ===== PROYECTO DETAIL PAGE (mismo base que listenmove) ===== */
+    .proj-hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 4rem 5rem;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .proj-hero-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 30%, rgba(123,97,255,0.10) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(0,245,196,0.06) 0%, transparent 50%);
+      z-index: 0;
+    }
+    .proj-hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(123,97,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(123,97,255,.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+    .proj-hero-visual {
+      position: absolute; inset: 0; z-index: 0;
+    }
+    .proj-hero-visual img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      opacity: 0.07;
+      filter: grayscale(60%) contrast(1.3);
+    }
+    .proj-hero-content {
+      position: relative; z-index: 2; max-width: 800px;
+    }
+    .back-link {
+      display: inline-flex; align-items: center; gap: .6rem;
+      font-size: .7rem; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 3rem;
+      transition: color .2s; cursor: none;
+    }
+    .back-link:hover { color: var(--accent); }
+    .back-link .arrow { font-size: 1rem; transition: transform .2s; }
+    .back-link:hover .arrow { transform: translateX(-4px); }
+    .proj-category {
+      font-size: .7rem; letter-spacing: 4px; color: var(--accent2);
+      text-transform: uppercase; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .proj-category::before {
+      content: ''; display: block; width: 30px; height: 1px;
+      background: var(--accent2);
+    }
+    .proj-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 6vw, 5.5rem);
+      font-weight: 900; line-height: .95;
+      letter-spacing: -2px; margin-bottom: 1.5rem;
+    }
+    .proj-title span {
+      display: block; color: transparent;
+      -webkit-text-stroke: 2px var(--accent2);
+    }
+    .proj-subtitle {
+      font-size: .9rem; color: var(--text-muted);
+      max-width: 550px; line-height: 1.8; margin-bottom: 2.5rem;
+    }
+    .proj-meta { display: flex; gap: 2.5rem; flex-wrap: wrap; }
+    .proj-meta-item { display: flex; flex-direction: column; gap: .25rem; }
+    .proj-meta-label { font-size: .6rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; }
+    .proj-meta-val { font-size: .82rem; color: var(--accent2); font-family: var(--font-display); font-weight: 700; }
+    .proj-scroll-hint {
+      position: absolute; right: 4rem; bottom: 3rem;
+      display: flex; flex-direction: column; align-items: center;
+      gap: .8rem; font-size: .6rem; letter-spacing: 3px;
+      color: var(--text-muted); text-transform: uppercase; z-index: 2;
+    }
+    .proj-scroll-line {
+      width: 1px; height: 60px;
+      background: linear-gradient(to bottom, var(--accent2), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity:.4; transform: scaleY(1); }
+      50% { opacity:1; transform: scaleY(1.2); }
+    }
+
+    /* accent2 para Alyra = color violeta/magenta */
+    :root { --accent2-rgb: 123,97,255; }
+
+    /* ===== SECTIONS ===== */
+    .proj-section {
+      position: relative; z-index: 1; padding: 6rem 4rem;
+    }
+    .proj-section--dark {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .section-eyebrow {
+      font-size: .65rem; letter-spacing: 4px;
+      color: var(--accent2); text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .prose-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 700; margin-bottom: 2rem;
+      letter-spacing: -1px; line-height: 1.1;
+    }
+    .prose-title .hl { color: var(--accent2); }
+    .prose-title .hl-g { color: var(--accent); }
+    .prose {
+      max-width: 680px; color: var(--text-muted);
+      font-size: .88rem; line-height: 1.9;
+    }
+    .prose p { margin-bottom: 1.2rem; }
+    .prose strong { color: var(--text); }
+
+    /* ===== STATUS BADGE ===== */
+    .wip-badge {
+      display: inline-flex; align-items: center; gap: .6rem;
+      background: rgba(123,97,255,.12);
+      border: 1px solid rgba(123,97,255,.35);
+      padding: .45rem 1.1rem;
+      font-size: .65rem; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--accent2);
+      margin-bottom: 2rem;
+    }
+    .wip-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent2);
+      animation: wipPulse 1.5s ease infinite;
+    }
+    @keyframes wipPulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:.4; transform:scale(.7); }
+    }
+
+    /* ===== INSPIRATION BLOCK ===== */
+    .inspiration-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 4rem; align-items: start;
+      margin-top: 3rem;
+    }
+    .insp-img-wrap {
+      position: relative;
+    }
+    .insp-img-wrap img {
+      width: 100%; display: block;
+      border: 1px solid var(--border);
+      object-fit: cover;
+    }
+    .insp-img-glow {
+      position: absolute; inset: -1px;
+      border: 1px solid var(--accent2);
+      opacity: .3; pointer-events: none;
+      transform: translate(8px, 8px);
+      transition: transform .4s;
+    }
+    .insp-img-wrap:hover .insp-img-glow { transform: translate(4px, 4px); }
+    .insp-label {
+      font-size: .6rem; letter-spacing: 2px;
+      color: var(--text-muted); text-transform: uppercase;
+      margin-top: .9rem; border-left: 2px solid var(--accent2);
+      padding-left: .7rem;
+    }
+
+    /* ===== HOJA DE PERSONAJE ===== */
+    .hoja-wrap {
+      position: relative; margin-top: 2rem;
+      cursor: zoom-in;
+    }
+    .hoja-wrap img {
+      width: 100%; display: block;
+      border: 1px solid var(--border);
+    }
+    .hoja-wrap:hover img { filter: brightness(1.05); }
+    .hoja-glow {
+      position: absolute; inset: -1px;
+      border: 1px solid var(--accent2);
+      opacity: .25; pointer-events: none;
+      transform: translate(10px, 10px);
+      transition: transform .4s;
+    }
+    .hoja-wrap:hover .hoja-glow { transform: translate(5px, 5px); }
+
+    /* ===== VISTAS GRID ===== */
+    .vistas-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+    .vista-card {
+      position: relative; overflow: hidden;
+      background: #000; border: 1px solid var(--border);
+      cursor: zoom-in; transition: border-color .3s;
+    }
+    .vista-card:hover { border-color: rgba(123,97,255,.5); }
+    .vista-card img {
+      width: 100%; display: block;
+      object-fit: cover; transition: transform .4s, filter .3s;
+    }
+    .vista-card:hover img { transform: scale(1.03); filter: brightness(1.08); }
+    .vista-card-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: .5rem .8rem;
+      background: linear-gradient(transparent, rgba(0,0,0,.85));
+      font-size: .6rem; letter-spacing: 2px;
+      color: var(--accent2); text-transform: uppercase;
+    }
+    .vista-glow {
+      position: absolute; inset: -1px;
+      border: 1px solid var(--accent2);
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s;
+    }
+    .vista-card:hover .vista-glow { opacity: .3; }
+
+    /* ===== TIMELAPSE VIDEO ===== */
+    .video-player {
+      position: relative; background: #000;
+      border: 1px solid var(--border);
+      overflow: hidden; cursor: pointer;
+    }
+    .video-player video {
+      width: 100%; display: block; object-fit: cover;
+    }
+    .vp-init-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(8,11,16,.55);
+      backdrop-filter: blur(3px);
+      transition: opacity .3s; z-index: 4;
+    }
+    .vp-init-overlay.hidden { opacity: 0; pointer-events: none; }
+    .vp-big-btn {
+      width: 68px; height: 68px; background: none;
+      border: 2px solid var(--accent2); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent2); transition: all .2s; cursor: pointer;
+    }
+    .vp-big-btn:hover { background: var(--accent2); color: var(--bg); transform: scale(1.1); }
+    .vp-controls {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: .5rem .8rem .6rem;
+      background: linear-gradient(transparent, rgba(0,0,0,.85));
+      display: flex; align-items: center; gap: .6rem;
+      z-index: 5; opacity: 0; transition: opacity .25s;
+    }
+    .video-player:hover .vp-controls,
+    .video-player.active .vp-controls { opacity: 1; }
+    .vp-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--accent2); padding: 2px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: color .15s, transform .15s;
+    }
+    .vp-btn:hover { color: #fff; transform: scale(1.15); }
+    .vp-btn svg { pointer-events: none; }
+    .vp-progress {
+      flex: 1; position: relative; height: 4px;
+      background: rgba(255,255,255,.2); border-radius: 2px; cursor: pointer;
+    }
+    .vp-progress-fill {
+      position: absolute; top: 0; left: 0;
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 2px; pointer-events: none;
+      transition: width .1s linear;
+    }
+    .vp-progress-thumb {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 12px; height: 12px; background: var(--accent2);
+      border-radius: 50%; margin-left: -6px; pointer-events: none;
+      transition: left .1s linear;
+      box-shadow: 0 0 6px rgba(123,97,255,.6);
+    }
+    .vp-time {
+      font-size: .6rem; letter-spacing: 1px;
+      color: var(--text-muted); white-space: nowrap;
+      flex-shrink: 0; min-width: 72px; text-align: right;
+    }
+    .vp-seek-flash {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      font-family: var(--font-display); font-size: .75rem;
+      letter-spacing: 2px; color: var(--accent2);
+      background: rgba(8,11,16,.7); padding: .4rem .9rem;
+      border: 1px solid var(--border); pointer-events: none;
+      opacity: 0; transition: opacity .2s; z-index: 6; white-space: nowrap;
+    }
+    .vp-seek-flash.show { opacity: 1; }
+    .vp-btn.vp-fs { margin-left: auto; }
+
+    /* Fullscreen scaling */
+    .video-player:-webkit-full-screen,
+    .video-player:fullscreen {
+      background: #000; width: 100vw !important; height: 100vh !important;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .video-player:-webkit-full-screen video,
+    .video-player:fullscreen video {
+      width: 100vw !important; height: 100vh !important;
+      object-fit: contain !important; max-height: 100vh;
+    }
+    .video-player:-webkit-full-screen .vp-controls,
+    .video-player:fullscreen .vp-controls {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      z-index: 99999; opacity: 1;
+    }
+
+    /* ===== ROADMAP ===== */
+    .roadmap {
+      margin-top: 3rem;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .roadmap-item {
+      display: grid; grid-template-columns: 160px 1fr;
+      gap: 2rem; align-items: start;
+      padding: 1.5rem 0; border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .roadmap-item:last-child { border-bottom: none; }
+    .roadmap-status {
+      display: flex; align-items: center; gap: .6rem;
+      font-size: .65rem; letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .roadmap-status.done { color: var(--accent); }
+    .roadmap-status.done .rs-dot { background: var(--accent); box-shadow: 0 0 8px rgba(0,245,196,.5); }
+    .roadmap-status.wip { color: var(--accent2); }
+    .roadmap-status.wip .rs-dot {
+      background: var(--accent2);
+      box-shadow: 0 0 8px rgba(123,97,255,.5);
+      animation: wipPulse 1.5s ease infinite;
+    }
+    .roadmap-status.pending { color: var(--text-muted); }
+    .roadmap-status.pending .rs-dot { background: var(--text-muted); opacity: .4; }
+    .rs-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .roadmap-desc { font-size: .85rem; color: var(--text-muted); line-height: 1.7; }
+    .roadmap-desc strong { color: var(--text); }
+
+    /* ===== MEDIA CONTAINER (labels) ===== */
+    .media-container { position: relative; }
+    .media-label {
+      position: relative; display: inline-block;
+      margin-top: 1rem; left: 0;
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: .6rem;
+      letter-spacing: 2px; padding: .3rem .8rem;
+      text-transform: uppercase; z-index: 10;
+    }
+    .media-glow {
+      position: absolute; inset: -1px;
+      border: 1px solid var(--accent2);
+      opacity: .2; pointer-events: none;
+      transform: translate(8px,8px); transition: transform .4s;
+    }
+    .media-container:hover .media-glow { transform: translate(4px,4px); }
+
+    /* ===== NEXT / BACK ===== */
+    .next-proj {
+      border-top: 1px solid var(--border);
+      padding: 4rem; display: flex;
+      align-items: center; justify-content: space-between;
+      position: relative; z-index: 1; transition: background .3s;
+    }
+    .next-proj:hover { background: var(--bg2); }
+    .next-label { font-size: .65rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; margin-bottom: .5rem; }
+    .next-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--text); transition: color .3s; }
+    .next-proj:hover .next-title { color: var(--accent2); }
+    .next-arrow { font-size: 2rem; color: var(--accent2); transition: transform .3s; }
+    .next-proj:hover .next-arrow { transform: translateX(8px); }
+
+    /* ===== LIGHTBOX ===== */
+    .lightbox-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.93);
+      z-index: 9999; display: flex;
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .3s;
+      cursor: zoom-out;
+    }
+    .lightbox-overlay.active { opacity: 1; pointer-events: all; }
+    .lightbox-overlay img {
+      max-width: 92vw; max-height: 90vh;
+      object-fit: contain;
+      border: 1px solid rgba(123,97,255,.3);
+      box-shadow: 0 0 60px rgba(123,97,255,.15);
+    }
+    .lightbox-close {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      background: none; border: 1px solid rgba(123,97,255,.4);
+      color: var(--accent2); font-size: 1.2rem;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .2s;
+    }
+    .lightbox-close:hover { background: var(--accent2); color: var(--bg); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .proj-hero { padding: 0 1.5rem 4rem; }
+      .proj-scroll-hint { display: none; }
+      .proj-section { padding: 4rem 1.5rem; }
+      .inspiration-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .vistas-grid { grid-template-columns: 1fr; }
+      .roadmap-item { grid-template-columns: 1fr; gap: .5rem; }
+      .next-proj { padding: 3rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor"></div>
+  <div class="cursor-trail"></div>
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">SLM<span class="dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html#sobre-mi">Sobre mí</a></li>
+      <li><a href="index.html#habilidades">Skills</a></li>
+      <li><a href="index.html#proyectos">Proyectos</a></li>
+      <li><a href="index.html#contacto">Contacto</a></li>
+    </ul>
+    <div class="nav-status">
+      <span class="status-dot"></span> Open to work
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="proj-hero">
+    <div class="proj-hero-bg"></div>
+    <div class="proj-hero-grid"></div>
+    <div class="proj-hero-visual">
+      <img src="Alyra/LadyConejita.png" alt="Alyra reference" />
+    </div>
+
+    <div class="proj-hero-content">
+      <a href="index.html#proyectos" class="back-link">
+        <span class="arrow">←</span> Volver a proyectos
+      </a>
+      <div class="proj-category">Blender · 3D · Character Art · En progreso</div>
+      <h1 class="proj-title">
+        ALYRA
+        <span>ORIGINAL CHARACTER</span>
+      </h1>
+      <p class="proj-subtitle">
+        Un modelo 3D de personaje original — concebido, diseñado y modelado completamente
+        desde cero. Cada vértice, cada hebra de cabello, cada textura y física: hecho a mano.
+        Un proyecto vivo que crece con el tiempo.
+      </p>
+      <div class="proj-meta">
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Inicio</span>
+          <span class="proj-meta-val">2024</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Estado</span>
+          <span class="proj-meta-val">En desarrollo</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Tech</span>
+          <span class="proj-meta-val">Blender · Shading · Rigging</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Tipo</span>
+          <span class="proj-meta-val">Personaje Original</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-scroll-hint">
+      <span>scroll</span>
+      <div class="proj-scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ── INTRO ── -->
+  <section class="proj-section reveal">
+    <div class="section-eyebrow">00 // El proyecto</div>
+    <h2 class="prose-title">Un personaje nacido<br><span class="hl">de mis propias manos.</span></h2>
+    <div class="wip-badge">
+      <div class="wip-dot"></div>
+      Proyecto en progreso activo
+    </div>
+    <div class="prose">
+      <p>
+        Alyra es un proyecto personal y ambicioso: crear un personaje 3D completamente original,
+        sin shortcuts, sin assets comprados. Desde la idea inicial hasta el rigging final,
+        todo pasa por mis manos.
+      </p>
+      <p>
+        El proceso comenzó con una búsqueda de referencia visual — la estética anime/3D que quería
+        capturar — seguida de una hoja de diseño de personaje hecha a mano, y luego el modelado
+        en Blender desde una malla en blanco. <strong>Cada extremidad, cada mechón de cabello,
+        cada detalle de ropa está siendo modelado a mano.</strong>
+      </p>
+      <p>
+        Este proyecto no tiene fecha de entrega. Es un ejercicio de maestría personal — ir tan lejos
+        como pueda: modelo base, pelo con curvas, texturas PBR, cloth simulation, y finalmente
+        un rig funcional para animación. Todo desde cero. Todo mío.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── INSPIRACIÓN ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">01 // Inspiración</div>
+    <h2 class="prose-title reveal">De la referencia<br><span class="hl">a la hoja de personaje.</span></h2>
+
+    <div class="inspiration-grid reveal">
+      <div>
+        <div class="insp-img-wrap" style="cursor:zoom-in;">
+          <img src="Alyra/LadyConejita.png" alt="Referencia Lady Conejita" id="insp-ref" />
+          <div class="insp-img-glow"></div>
+        </div>
+        <div class="insp-label">Referencia visual — punto de partida estético</div>
+      </div>
+
+      <div>
+        <div class="prose" style="margin-bottom:1.5rem;">
+          <p>
+            El primer paso en la creación de cualquier personaje es encontrar el lenguaje visual
+            que quieres hablar. Esta referencia definió la dirección estética de Alyra:
+            <strong>líneas limpias, proporciones anime, carácter fuerte.</strong>
+          </p>
+          <p>
+            A partir de ahí, con lápiz (digital) sobre papel, construí la hoja de diseño del personaje:
+            vistas frontal y trasera, proporciones exactas, paleta de colores, detalles de ropa y accesorios.
+            Esta hoja es la biblia del personaje — la referencia que acompaña cada sesión de modelado.
+          </p>
+        </div>
+        <div class="hoja-wrap" id="hoja-clickable">
+          <img src="Alyra/hoja diseñoCorrecta.png" alt="Hoja de diseño de personaje Alyra" />
+          <div class="hoja-glow"></div>
+        </div>
+        <div class="insp-label" style="margin-top:.9rem;">Hoja de diseño — Alyra (clic para ampliar)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MODELADO ── -->
+  <section class="proj-section">
+    <div class="section-eyebrow">02 // Modelado en Blender</div>
+    <h2 class="prose-title reveal">Cuatro vistas.<br><span class="hl-g">Un solo</span> <span class="hl">personaje.</span></h2>
+
+    <div class="prose reveal" style="margin-bottom:2.5rem;">
+      <p>
+        El modelado sigue una metodología clásica: se trabaja con la hoja de diseño como fondo
+        de referencia en Blender, esculpiendo la silueta vista a vista. Cada ángulo importa —
+        un modelo que solo se ve bien de frente no está terminado.
+      </p>
+    </div>
+
+    <div class="vistas-grid reveal">
+      <div class="vista-card" data-img="Alyra/Mirar2.png">
+        <img src="Alyra/Mirar2.png" alt="Vista frontal — Alyra en Blender" />
+        <div class="vista-card-label">// Vista frontal</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Alyra/mirar1.png">
+        <img src="Alyra/mirar1.png" alt="Vista diagonal — Alyra en Blender" />
+        <div class="vista-card-label">// Vista diagonal</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Alyra/lateral.png">
+        <img src="Alyra/lateral.png" alt="Vista lateral — Alyra en Blender" />
+        <div class="vista-card-label">// Vista lateral</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Alyra/tracera.png">
+        <img src="Alyra/tracera.png" alt="Vista trasera — Alyra en Blender" />
+        <div class="vista-card-label">// Vista trasera</div>
+        <div class="vista-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TIMELAPSE ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">03 // Timelapse</div>
+    <h2 class="prose-title reveal">De la nada<br><span class="hl">a la forma.</span></h2>
+
+    <div class="prose reveal" style="margin-bottom:2.5rem;">
+      <p>
+        Este timelapse documenta el progreso del modelado: desde los primeros bloques sin forma
+        hasta las curvas y silueta reconocibles del personaje. Cada frame fue capturado durante
+        sesiones reales de trabajo.
+      </p>
+    </div>
+
+    <div class="reveal" style="max-width: 820px; margin: 0 auto;">
+      <div class="media-container">
+        <div class="video-player" data-vid="vid-alyra">
+          <video id="vid-alyra" src="Alyra/VideoAlyra.mp4" preload="metadata" playsinline></video>
+          <div class="vp-init-overlay" id="vpi-alyra">
+            <button class="vp-big-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+          </div>
+          <div class="vp-seek-flash" id="vsf-alyra"></div>
+          <div class="vp-controls">
+            <button class="vp-btn" data-action="rewind" title="-10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            </button>
+            <button class="vp-btn" data-action="playpause" title="Play/Pause">
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="vp-btn" data-action="forward" title="+10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+            </button>
+            <div class="vp-progress" data-action="seek">
+              <div class="vp-progress-fill"></div>
+              <div class="vp-progress-thumb"></div>
+            </div>
+            <span class="vp-time">0:00 / 0:00</span>
+            <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="media-label">Timelapse de modelado — Alyra en Blender</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ROADMAP ── -->
+  <section class="proj-section">
+    <div class="section-eyebrow">04 // Roadmap</div>
+    <h2 class="prose-title reveal">Lo hecho.<br><span class="hl">Lo que viene.</span></h2>
+
+    <div class="prose reveal" style="margin-bottom:.5rem;">
+      <p>Este proyecto se actualiza. Cada fase completada es un hito real.</p>
+    </div>
+
+    <div class="roadmap reveal">
+      <div class="roadmap-item">
+        <div class="roadmap-status done">
+          <div class="rs-dot"></div> Completado
+        </div>
+        <div class="roadmap-desc">
+          <strong>Concepto y referencia visual</strong> — Búsqueda de inspiración estética,
+          definición del estilo del personaje.
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status done">
+          <div class="rs-dot"></div> Completado
+        </div>
+        <div class="roadmap-desc">
+          <strong>Hoja de diseño de personaje</strong> — Vistas frontal y trasera, proporciones,
+          paleta de colores, detalles de vestuario.
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status wip">
+          <div class="rs-dot"></div> En progreso
+        </div>
+        <div class="roadmap-desc">
+          <strong>Modelado 3D en Blender</strong> — Cuerpo base, extremidades, cabeza,
+          rostro, proporciones generales. Actualmente en refinamiento de silueta.
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status pending">
+          <div class="rs-dot"></div> Pendiente
+        </div>
+        <div class="roadmap-desc">
+          <strong>Modelado de cabello</strong> — Curvas y simulación de pelo,
+          mechas individuales, dinámica.
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status pending">
+          <div class="rs-dot"></div> Pendiente
+        </div>
+        <div class="roadmap-desc">
+          <strong>Ropa y accesorios</strong> — Modelado de vestuario según hoja de diseño,
+          cloth simulation, detalles de superficie.
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status pending">
+          <div class="rs-dot"></div> Pendiente
+        </div>
+        <div class="roadmap-desc">
+          <strong>Texturizado y shading</strong> — UV unwrap, materiales PBR,
+          skin shader, ojos expresivos.
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status pending">
+          <div class="rs-dot"></div> Pendiente
+        </div>
+        <div class="roadmap-desc">
+          <strong>Rigging</strong> — Esqueleto completo, IK/FK, shape keys para expresiones
+          faciales. El objetivo final: un personaje animable.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BACK ── -->
+  <a href="index.html#proyectos" class="next-proj">
+    <div>
+      <div class="next-label">← Volver</div>
+      <div class="next-title">Todos los proyectos</div>
+    </div>
+    <div class="next-arrow">→</div>
+  </a>
+
+  <footer class="footer">
+    <span>Santiago Londoño Mendez © 2026</span>
+    <span>Diseñado y codificado por mí.</span>
+  </footer>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox-overlay" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">✕</button>
+    <img id="lightbox-img" src="" alt="" />
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+  /* =====================================================================
+     VIDEO PLAYER
+     ===================================================================== */
+  (function initPlayers() {
+    function fmtTime(s) {
+      if (isNaN(s)) return '0:00';
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60).toString().padStart(2, '0');
+      return m + ':' + sec;
+    }
+    function showFlash(flashEl, msg) {
+      if (!flashEl) return;
+      flashEl.textContent = msg;
+      flashEl.classList.add('show');
+      clearTimeout(flashEl._t);
+      flashEl._t = setTimeout(() => flashEl.classList.remove('show'), 700);
+    }
+
+    document.querySelectorAll('.video-player').forEach(function(player) {
+      const video   = player.querySelector('video');
+      const initOv  = player.querySelector('.vp-init-overlay');
+      const flashEl = player.querySelector('.vp-seek-flash');
+      const fill    = player.querySelector('.vp-progress-fill');
+      const thumb   = player.querySelector('.vp-progress-thumb');
+      const timeEl  = player.querySelector('.vp-time');
+      const ppBtn   = player.querySelector('[data-action="playpause"]');
+      const iconPlay  = ppBtn ? ppBtn.querySelector('.icon-play')  : null;
+      const iconPause = ppBtn ? ppBtn.querySelector('.icon-pause') : null;
+      const progBar = player.querySelector('[data-action="seek"]');
+      if (!video) return;
+
+      function syncIcons() {
+        if (!iconPlay || !iconPause) return;
+        iconPlay.style.display  = video.paused ? 'block' : 'none';
+        iconPause.style.display = video.paused ? 'none'  : 'block';
+      }
+      function updateProgress() {
+        if (!video.duration) return;
+        const pct = (video.currentTime / video.duration) * 100;
+        if (fill)  fill.style.width = pct + '%';
+        if (thumb) thumb.style.left = pct + '%';
+        if (timeEl) timeEl.textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
+      }
+
+      if (initOv) {
+        const bigBtn = initOv.querySelector('.vp-big-btn');
+        if (bigBtn) bigBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          video.play().then(function() {
+            initOv.classList.add('hidden');
+            player.classList.add('active');
+            syncIcons();
+          }).catch(console.error);
+        });
+      }
+      video.addEventListener('click', function() {
+        if (video.paused) { video.play().then(() => { syncIcons(); player.classList.add('active'); }); }
+        else { video.pause(); syncIcons(); }
+      });
+      if (ppBtn) ppBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (video.paused) { video.play().then(() => { syncIcons(); player.classList.add('active'); }); }
+        else { video.pause(); syncIcons(); }
+      });
+
+      /* ── fullscreen toggle ── */
+      var fsIconEnter = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+      var fsIconExit  = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+      player.querySelectorAll('[data-action="fullscreen"]').forEach(function(btn) {
+        var btnSvg = btn.querySelector('svg');
+        function updateFsIcon() {
+          var isFs = (document.fullscreenElement === player || document.webkitFullscreenElement === player);
+          if (btnSvg) btnSvg.innerHTML = isFs ? fsIconExit : fsIconEnter;
+          btn.title = isFs ? 'Salir de pantalla completa' : 'Pantalla completa';
+        }
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var isFs = (document.fullscreenElement === player || document.webkitFullscreenElement === player);
+          if (isFs) {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          } else {
+            if (player.requestFullscreen) player.requestFullscreen();
+            else if (player.webkitRequestFullscreen) player.webkitRequestFullscreen();
+          }
+        });
+        document.addEventListener('fullscreenchange', updateFsIcon);
+        document.addEventListener('webkitfullscreenchange', updateFsIcon);
+      });
+
+      player.querySelectorAll('[data-action="rewind"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          video.currentTime = Math.max(0, video.currentTime - 10);
+          showFlash(flashEl, '← 10s'); updateProgress();
+        });
+      });
+      player.querySelectorAll('[data-action="forward"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          video.currentTime = Math.min(video.duration || 0, video.currentTime + 10);
+          showFlash(flashEl, '+10s →'); updateProgress();
+        });
+      });
+
+      if (progBar) {
+        let seeking = false;
+        function seekTo(e) {
+          const rect = progBar.getBoundingClientRect();
+          const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          video.currentTime = pct * (video.duration || 0);
+          updateProgress();
+        }
+        progBar.addEventListener('mousedown', function(e) { e.stopPropagation(); seeking = true; seekTo(e); });
+        window.addEventListener('mousemove', function(e) { if (seeking) seekTo(e); });
+        window.addEventListener('mouseup', function() { seeking = false; });
+        progBar.addEventListener('touchstart', function(e) { e.stopPropagation(); seeking = true; seekTo(e.touches[0]); }, { passive: true });
+        window.addEventListener('touchmove', function(e) { if (seeking) seekTo(e.touches[0]); }, { passive: true });
+        window.addEventListener('touchend', function() { seeking = false; });
+      }
+
+      video.addEventListener('timeupdate', updateProgress);
+      video.addEventListener('loadedmetadata', updateProgress);
+      video.addEventListener('ended', function() {
+        if (!video.loop) { initOv && initOv.classList.remove('hidden'); syncIcons(); }
+      });
+    });
+  })();
+
+  /* =====================================================================
+     LIGHTBOX — imágenes clickeables
+     ===================================================================== */
+  (function initLightbox() {
+    const overlay  = document.getElementById('lightbox');
+    const lbImg    = document.getElementById('lightbox-img');
+    const closeBtn = document.getElementById('lightbox-close');
+    if (!overlay || !lbImg) return;
+
+    function open(src, alt) {
+      lbImg.src = src; lbImg.alt = alt || '';
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function close() {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    /* Todas las imágenes clickeables */
+    document.querySelectorAll('.vista-card, .insp-img-wrap, .hoja-wrap').forEach(function(el) {
+      el.addEventListener('click', function() {
+        const img = el.querySelector('img') || el;
+        const src = el.dataset.img || (img.tagName === 'IMG' ? img.src : '');
+        if (src) open(src, img.alt || '');
+      });
+    });
+
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay || e.target === lbImg) close();
+    });
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close(); });
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ListenMove — Pin de Navegación Inteligente | SLM</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    /* ===== PROYECTO DETAIL PAGE ===== */
+    .proj-hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 4rem 5rem;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .proj-hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 60% 40%, rgba(0,245,196,0.07) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(123,97,255,0.08) 0%, transparent 50%);
+      z-index: 0;
+    }
+
+    .proj-hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,245,196,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,196,.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* Imagen de fondo hero */
+    .proj-hero-visual {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .proj-hero-visual img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.08;
+      filter: grayscale(100%) contrast(1.2);
+    }
+
+    .proj-hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      font-size: .7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 3rem;
+      transition: color .2s;
+      cursor: none;
+    }
+    .back-link:hover { color: var(--accent); }
+    .back-link .arrow { font-size: 1rem; transition: transform .2s; }
+    .back-link:hover .arrow { transform: translateX(-4px); }
+
+    .proj-category {
+      font-size: .7rem;
+      letter-spacing: 4px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+    .proj-category::before {
+      content: '';
+      display: block;
+      width: 30px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .proj-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 6vw, 5.5rem);
+      font-weight: 900;
+      line-height: .95;
+      letter-spacing: -2px;
+      margin-bottom: 1.5rem;
+    }
+    .proj-title span {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--accent);
+    }
+
+    .proj-subtitle {
+      font-size: .9rem;
+      color: var(--text-muted);
+      max-width: 550px;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+    }
+
+    .proj-meta {
+      display: flex;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .proj-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: .25rem;
+    }
+    .proj-meta-label {
+      font-size: .6rem;
+      letter-spacing: 3px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .proj-meta-val {
+      font-size: .82rem;
+      color: var(--accent);
+      font-family: var(--font-display);
+      font-weight: 700;
+    }
+
+    .proj-scroll-hint {
+      position: absolute;
+      right: 4rem;
+      bottom: 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .8rem;
+      font-size: .6rem;
+      letter-spacing: 3px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      z-index: 2;
+    }
+    .proj-scroll-line {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity: .4; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.2); }
+    }
+
+    /* ===== SECTIONS ===== */
+    .proj-section {
+      position: relative;
+      z-index: 1;
+      padding: 6rem 4rem;
+    }
+    .proj-section--dark {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-eyebrow {
+      font-size: .65rem;
+      letter-spacing: 4px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .prose-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 700;
+      margin-bottom: 2rem;
+      letter-spacing: -1px;
+      line-height: 1.1;
+    }
+    .prose-title .hl { color: var(--accent); }
+
+    .prose {
+      max-width: 680px;
+      color: var(--text-muted);
+      font-size: .88rem;
+      line-height: 1.9;
+    }
+    .prose p { margin-bottom: 1.2rem; }
+    .prose strong { color: var(--text); }
+
+    /* ===== TEAM ===== */
+    .team-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .team-tag {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: .6rem 1.2rem;
+      font-size: .72rem;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      position: relative;
+      transition: all .3s;
+    }
+    .team-tag.highlight {
+      border-color: rgba(0,245,196,.5);
+      color: var(--accent);
+    }
+    .team-tag::before {
+      content: '//';
+      margin-right: .5rem;
+      color: var(--accent);
+      opacity: .5;
+    }
+
+    /* ===== FASE BLOCK ===== */
+    .fase-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      margin-bottom: 6rem;
+    }
+    .fase-block:last-child { margin-bottom: 0; }
+    .fase-block.reverse { direction: rtl; }
+    .fase-block.reverse > * { direction: ltr; }
+
+    .fase-text { }
+    .fase-num {
+      font-family: var(--font-display);
+      font-size: 5rem;
+      font-weight: 900;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(0,245,196,.2);
+      line-height: 1;
+      margin-bottom: .5rem;
+    }
+    .fase-label {
+      font-size: .65rem;
+      letter-spacing: 4px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .fase-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.3rem, 2.5vw, 2rem);
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      letter-spacing: -1px;
+    }
+    .fase-body {
+      color: var(--text-muted);
+      font-size: .85rem;
+      line-height: 1.9;
+    }
+    .fase-body p { margin-bottom: .8rem; }
+    .fase-body strong { color: var(--text); }
+
+    /* ===== MEDIA CONTAINER ===== */
+    .media-container {
+      position: relative;
+    }
+    .media-wrap {
+      position: relative;
+      background: #000;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .media-wrap img,
+    .media-wrap video {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+    .media-wrap video { cursor: pointer; }
+    .media-glow {
+      position: absolute;
+      inset: -1px;
+      border: 1px solid var(--accent);
+      opacity: .25;
+      pointer-events: none;
+      transform: translate(8px, 8px);
+      transition: transform .4s;
+    }
+    .media-wrap:hover ~ .media-glow,
+    .media-container:hover .media-glow {
+      transform: translate(4px, 4px);
+    }
+    .media-label {
+      position: relative;
+      display: inline-block;
+      margin-top: 1rem;
+      left: 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: .6rem;
+      letter-spacing: 2px;
+      padding: .3rem .8rem;
+      text-transform: uppercase;
+      z-index: 10;
+    }
+
+    /* ===== IMAGE PAIR ===== */
+    .img-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    /* ===== VIDEO PLAYER ===== */
+    .video-player {
+      position: relative;
+      background: #000;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .video-player video {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+    .vp-init-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(8,11,16,.55);
+      backdrop-filter: blur(3px);
+      transition: opacity .3s;
+      z-index: 4;
+    }
+    .vp-init-overlay.hidden { opacity: 0; pointer-events: none; }
+    .vp-big-btn {
+      width: 68px; height: 68px;
+      background: none;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent);
+      transition: all .2s;
+      cursor: pointer;
+    }
+    .vp-big-btn:hover { background: var(--accent); color: var(--bg); transform: scale(1.1); }
+    .vp-controls {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: .5rem .8rem .6rem;
+      background: linear-gradient(transparent, rgba(0,0,0,.85));
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      z-index: 5;
+      opacity: 0;
+      transition: opacity .25s;
+    }
+    .video-player:hover .vp-controls,
+    .video-player.active .vp-controls { opacity: 1; }
+    .vp-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--accent); padding: 2px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: color .15s, transform .15s;
+    }
+    .vp-btn:hover { color: #fff; transform: scale(1.15); }
+    .vp-btn svg { pointer-events: none; }
+    .vp-progress {
+      flex: 1;
+      position: relative;
+      height: 4px;
+      background: rgba(255,255,255,.2);
+      border-radius: 2px;
+      cursor: pointer;
+    }
+    .vp-progress-fill {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      pointer-events: none;
+      transition: width .1s linear;
+    }
+    .vp-progress-thumb {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 12px; height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-left: -6px;
+      pointer-events: none;
+      transition: left .1s linear;
+      box-shadow: 0 0 6px rgba(0,245,196,.6);
+    }
+    .vp-time {
+      font-size: .6rem;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 72px;
+      text-align: right;
+    }
+    .vp-seek-flash {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-display);
+      font-size: .75rem;
+      letter-spacing: 2px;
+      color: var(--accent);
+      background: rgba(8,11,16,.7);
+      padding: .4rem .9rem;
+      border: 1px solid var(--border);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .2s;
+      z-index: 6;
+      white-space: nowrap;
+    }
+    .vp-seek-flash.show { opacity: 1; }
+    .pruebas-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .pruebas-pair .video-player video {
+      max-height: 480px;
+      object-fit: contain;
+    }
+    @media (max-width: 700px) {
+      .pruebas-pair { grid-template-columns: 1fr; max-width: 360px; }
+    }
+
+    /* ===== LIGHTBOX ===== */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.92);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+      cursor: zoom-out;
+    }
+    .lightbox-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .lightbox-overlay img {
+      max-width: 92vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border: 1px solid rgba(0,245,196,.3);
+      box-shadow: 0 0 60px rgba(0,245,196,.15);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1.5rem; right: 1.5rem;
+      background: none;
+      border: 1px solid rgba(0,245,196,.4);
+      color: var(--accent);
+      font-size: 1.2rem;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .lightbox-close:hover { background: var(--accent); color: var(--bg); }
+
+    /* Clickable images */
+    .media-wrap img {
+      cursor: zoom-in;
+      transition: filter .3s;
+    }
+    .media-wrap img:hover { filter: brightness(1.1); }
+
+    /* Fullscreen button for videos */
+    .vp-btn.vp-fs { margin-left: auto; }
+
+    /* Fullscreen: video siempre contain para que verticales no se recorten */
+    .video-player:-webkit-full-screen,
+    .video-player:fullscreen {
+      background: #000;
+      width: 100vw !important;
+      height: 100vh !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .video-player:-webkit-full-screen video,
+    .video-player:fullscreen video {
+      width: 100vw !important;
+      height: 100vh !important;
+      object-fit: contain !important;
+      max-height: 100vh;
+    }
+    .video-player:-webkit-full-screen .vp-controls,
+    .video-player:fullscreen .vp-controls {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 99999;
+      opacity: 1;
+    }
+    .video-player:-webkit-full-screen .vp-init-overlay,
+    .video-player:fullscreen .vp-init-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99998;
+    }
+
+    /* ===== LIGHTBOX ===== */
+    .specs-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .spec-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      transition: all .3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .spec-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s;
+    }
+    .spec-card:hover::before { transform: scaleX(1); }
+    .spec-card:hover {
+      border-color: rgba(0,245,196,.4);
+      transform: translateY(-4px);
+    }
+    .spec-icon { font-size: 1.5rem; margin-bottom: .8rem; }
+    .spec-name {
+      font-family: var(--font-display);
+      font-size: .7rem;
+      letter-spacing: 1px;
+      margin-bottom: .4rem;
+      color: var(--accent);
+    }
+    .spec-val { font-size: .75rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* ===== CIERRE ===== */
+    .cierre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 3rem;
+      position: relative;
+      overflow: hidden;
+      max-width: 760px;
+      margin: 3rem auto 0;
+      text-align: center;
+    }
+    .cierre::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(135deg, rgba(0,245,196,.15), transparent, rgba(123,97,255,.15));
+      pointer-events: none;
+    }
+    .cierre-quote {
+      font-family: var(--font-display);
+      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      line-height: 1.4;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.5px;
+    }
+    .cierre-quote .hl { color: var(--accent); }
+    .cierre-body {
+      color: var(--text-muted);
+      font-size: .83rem;
+      line-height: 1.9;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    /* ===== NEXT PROJECT ===== */
+    .next-proj {
+      border-top: 1px solid var(--border);
+      padding: 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+      transition: background .3s;
+    }
+    .next-proj:hover { background: var(--bg2); }
+    .next-label { font-size: .65rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; margin-bottom: .5rem; }
+    .next-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--text); transition: color .3s; }
+    .next-proj:hover .next-title { color: var(--accent); }
+    .next-arrow { font-size: 2rem; color: var(--accent); transition: transform .3s; }
+    .next-proj:hover .next-arrow { transform: translateX(8px); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .proj-hero { padding: 0 1.5rem 4rem; }
+      .proj-scroll-hint { display: none; }
+      .proj-section { padding: 4rem 1.5rem; }
+      .fase-block { grid-template-columns: 1fr; gap: 2.5rem; }
+      .fase-block.reverse { direction: ltr; }
+      .specs-row { grid-template-columns: repeat(2, 1fr); }
+      .img-pair { grid-template-columns: 1fr; }
+      .next-proj { padding: 3rem 1.5rem; }
+    }
+    @media (max-width: 480px) {
+      .specs-row { grid-template-columns: 1fr; }
+      .proj-meta { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor"></div>
+  <div class="cursor-trail"></div>
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">SLM<span class="dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html#sobre-mi">Sobre mí</a></li>
+      <li><a href="index.html#habilidades">Skills</a></li>
+      <li><a href="index.html#proyectos">Proyectos</a></li>
+      <li><a href="index.html#contacto">Contacto</a></li>
+    </ul>
+    <div class="nav-status">
+      <span class="status-dot"></span> Open to work
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="proj-hero">
+    <div class="proj-hero-bg"></div>
+    <div class="proj-hero-grid"></div>
+    <div class="proj-hero-visual">
+      <img src="ListenMove/Carcasa1.jpeg" alt="ListenMove device" />
+    </div>
+
+    <div class="proj-hero-content">
+      <a href="index.html#proyectos" class="back-link">
+        <span class="arrow">←</span> Volver a proyectos
+      </a>
+      <div class="proj-category">Hardware · Software · IoT · Accesibilidad</div>
+      <h1 class="proj-title">
+        PIN DE NAVEGACIÓN
+        <span>INTELIGENTE</span>
+      </h1>
+      <p class="proj-subtitle">
+        ListenMove — Un dispositivo físico de navegación interior para personas con discapacidad visual,
+        diseñado específicamente para el campus de la Universidad Autónoma de Occidente.
+        Tecnología con propósito. Ingeniería con corazón.
+      </p>
+      <div class="proj-meta">
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Año</span>
+          <span class="proj-meta-val">2025</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Rol</span>
+          <span class="proj-meta-val">Diseño 3D · Hardware</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Tech</span>
+          <span class="proj-meta-val">ESP32 · Raspberry Pi · Blender · SolidWorks</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Tipo</span>
+          <span class="proj-meta-val">Producto Físico</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-scroll-hint">
+      <span>scroll</span>
+      <div class="proj-scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ── INTRO ── -->
+  <section class="proj-section reveal">
+    <div class="section-eyebrow">00 // El proyecto</div>
+    <h2 class="prose-title">Un problema real.<br><span class="hl">Una solución tangible.</span></h2>
+    <div class="prose">
+      <p>
+        En la Universidad Autónoma de Occidente, los estudiantes con discapacidad visual se enfrentan
+        a un reto cotidiano y silencioso: moverse de forma autónoma y segura por el campus.
+        Pasillos largos, cambios de aula de último minuto, sótanos sin señalización adecuada —
+        obstáculos invisibles para muchos, pero barreras reales para quienes no pueden ver.
+      </p>
+      <p>
+        <strong>ListenMove nació de esa necesidad.</strong> No como una app. No como una pantalla más.
+        Sino como un dispositivo físico que se lleva encima, que escucha, que habla y que guía —
+        un pin inteligente que convierte la infraestructura Wi-Fi del campus en un sistema de
+        navegación auditiva en tiempo real.
+      </p>
+      <p>
+        Este proyecto pasó por múltiples fases de adaptación, rediseño y prueba real.
+        Lo que ves aquí no es una maqueta conceptual: <strong>es un producto mínimo viable que funciona</strong>,
+        construido con recursos limitados, tiempo acotado y una convicción enorme.
+      </p>
+    </div>
+
+    <div class="team-grid reveal" style="margin-top: 3rem;">
+      <div class="section-eyebrow" style="width:100%; margin-bottom:.5rem;">// Equipo</div>
+      <div class="team-tag highlight">Santiago Londoño Mendez — Diseño 3D · Hardware</div>
+      <div class="team-tag">Niko Alejandro Bonilla Martínez</div>
+      <div class="team-tag">Eddy Santiago Samudio Cuellar</div>
+      <div class="team-tag">Darwin Andrés Criollo León</div>
+      <div class="team-tag">Omar Yesid Álvarez Escobar</div>
+    </div>
+  </section>
+
+  <!-- ── FASE 1: CONCEPTO ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">01 // Fase conceptual</div>
+    <h2 class="prose-title reveal">De la idea<br><span class="hl">al primer render.</span></h2>
+
+    <div class="fase-block">
+      <div class="fase-text reveal">
+        <div class="fase-num">01</div>
+        <div class="fase-label">Primer diseño — Blender</div>
+        <h3 class="fase-title">El dispositivo que imaginamos</h3>
+        <div class="fase-body">
+          <p>
+            La propuesta inicial tenía un objetivo ambicioso: crear un dispositivo compacto,
+            ergonómico, que pudiera portarse sin incomodar, y que aprovechara la red Wi-Fi de la UAO
+            para orientar al usuario mediante audio. Un pin que se prende en la ropa y habla.
+          </p>
+          <p>
+            El <strong>primer modelo 3D lo diseñé yo completamente en Blender</strong>.
+            Cada curva, cada detalle de forma fue pensado para que el objeto se sintiera
+            natural en la mano y liviano en el bolsillo. La propuesta de valor era clara:
+            tecnología diseñada <strong>exclusivamente para la Autónoma</strong>, con los
+            puntos de acceso Wi-Fi del campus como infraestructura de localización.
+          </p>
+          <p>
+            Este prototipo visual sentó las bases de todo lo que vendría después —
+            aunque la realidad de los componentes y el presupuesto nos obligaría a repensar
+            casi todo.
+          </p>
+        </div>
+      </div>
+
+      <div class="media-container reveal" data-delay="2">
+        <div class="img-pair">
+          <div class="media-wrap">
+            <img src="ListenMove/Blender1.png" alt="Modelo Blender 1 — ListenMove" />
+          </div>
+          <div class="media-wrap">
+            <img src="ListenMove/Blender2.png" alt="Modelo Blender 2 — ListenMove" />
+          </div>
+        </div>
+        <div class="media-label">Render — Blender 3D</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+
+    <!-- Video primer prototipo -->
+    <div class="reveal" style="max-width: 720px; margin: 4rem auto 0;">
+      <div class="section-eyebrow" style="margin-bottom: 1rem;">// Animación conceptual</div>
+      <div class="media-container">
+        <div class="video-player" data-vid="vid-1" data-loop="true">
+          <video id="vid-1" src="ListenMove/PrimerPrototipo.mp4" preload="metadata" playsinline loop></video>
+          <div class="vp-init-overlay" id="vpi-1">
+            <button class="vp-big-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+          </div>
+          <div class="vp-seek-flash" id="vsf-1"></div>
+          <div class="vp-controls">
+            <button class="vp-btn" data-action="rewind" title="-10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="14" text-anchor="middle" font-size="5" fill="currentColor" font-family="monospace">10</text></svg>
+            </button>
+            <button class="vp-btn" data-action="playpause" title="Play/Pause">
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="vp-btn" data-action="forward" title="+10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="12" y="14" text-anchor="middle" font-size="5" fill="currentColor" font-family="monospace">10</text></svg>
+            </button>
+            <div class="vp-progress" data-action="seek">
+              <div class="vp-progress-fill"></div>
+              <div class="vp-progress-thumb"></div>
+            </div>
+            <span class="vp-time">0:00 / 0:00</span>
+            <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="media-label">Animación 3D — Primer prototipo conceptual</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FASE 2: REDISEÑO ── -->
+  <section class="proj-section">
+    <div class="section-eyebrow">02 // Fase de rediseño</div>
+    <h2 class="prose-title reveal">Cuando la realidad<br><span class="hl">redefine el diseño.</span></h2>
+
+    <div class="fase-block reverse">
+      <div class="fase-text reveal">
+        <div class="fase-num">02</div>
+        <div class="fase-label">Rediseño — SolidWorks</div>
+        <h3 class="fase-title">Del render a la impresión 3D</h3>
+        <div class="fase-body">
+          <p>
+            Diseñar algo bonito en Blender es una cosa. Diseñar algo que se puede imprimir,
+            que tiene medidas exactas, tolerancias reales y espacio suficiente para los
+            componentes electrónicos, es otra completamente diferente.
+          </p>
+          <p>
+            Por cuestiones de presupuesto y disponibilidad de componentes, el diseño original
+            tuvo que adaptarse. Migré el modelo a <strong>SolidWorks</strong>, donde rehíce
+            la carcasa desde cero con parámetros precisos: dimensiones calculadas para albergar
+            todos los componentes electrónicos en el espacio más compacto posible.
+          </p>
+          <p>
+            Fue en esta fase donde nos dimos cuenta de que el <strong>ESP32</strong> solo
+            no sería suficiente. El volumen de procesamiento que requería el sistema — escaneo
+            Wi-Fi, audio en tiempo real, gestión de módulos — superaba su capacidad.
+            Necesitábamos un cerebro más potente: la <strong>Raspberry Pi</strong>.
+            El nuevo diseño tuvo que contemplar espacio para ambas placas.
+          </p>
+          <p>
+            <strong>Este segundo diseño también lo hice yo completamente</strong>.
+            Cada milímetro fue calculado para que la impresión 3D resultara en una pieza
+            funcional, no solo decorativa. El objetivo: un Producto Mínimo Viable real,
+            que se pudiera tener en las manos y probar.
+          </p>
+        </div>
+      </div>
+
+      <div class="media-container reveal" data-delay="2">
+        <div class="img-pair">
+          <div class="media-wrap">
+            <img src="ListenMove/Carcasa1.jpeg" alt="Carcasa SolidWorks 1" />
+          </div>
+          <div class="media-wrap">
+            <img src="ListenMove/Carcasa2.jpeg" alt="Carcasa SolidWorks 2" />
+          </div>
+        </div>
+        <div class="media-label">Carcasa — SolidWorks + Impresión 3D</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+
+    <!-- Video SolidWorks -->
+    <div class="reveal" style="max-width: 720px; margin: 4rem auto 0;">
+      <div class="section-eyebrow" style="margin-bottom: 1rem;">// Modelo paramétrico</div>
+      <div class="media-container">
+        <div class="video-player" data-vid="vid-2" data-loop="true">
+          <video id="vid-2" src="ListenMove/Solid.mp4" preload="metadata" playsinline loop></video>
+          <div class="vp-init-overlay" id="vpi-2">
+            <button class="vp-big-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+          </div>
+          <div class="vp-seek-flash" id="vsf-2"></div>
+          <div class="vp-controls">
+            <button class="vp-btn" data-action="rewind" title="-10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="14" text-anchor="middle" font-size="5" fill="currentColor" font-family="monospace">10</text></svg>
+            </button>
+            <button class="vp-btn" data-action="playpause" title="Play/Pause">
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="vp-btn" data-action="forward" title="+10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="12" y="14" text-anchor="middle" font-size="5" fill="currentColor" font-family="monospace">10</text></svg>
+            </button>
+            <div class="vp-progress" data-action="seek">
+              <div class="vp-progress-fill"></div>
+              <div class="vp-progress-thumb"></div>
+            </div>
+            <span class="vp-time">0:00 / 0:00</span>
+            <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="media-label">Render paramétrico — SolidWorks</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FASE 3: ENSAMBLE ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">03 // Ensamble</div>
+    <h2 class="prose-title reveal">El alma<br><span class="hl">del dispositivo.</span></h2>
+
+    <div class="fase-block">
+      <div class="fase-text reveal">
+        <div class="fase-num">03</div>
+        <div class="fase-label">Hardware — Raspberry Pi + ESP32 + Componentes</div>
+        <h3 class="fase-title">Colocando el sistema dentro de la carcasa</h3>
+        <div class="fase-body">
+          <p>
+            Con la carcasa impresa y los componentes en mano, comenzó la fase más técnica:
+            integrar todo el sistema dentro del espacio físico. Compramos un micrófono INMP441,
+            un módulo GPS NEO-6M y otros componentes para armar el dispositivo desde cero.
+          </p>
+          <p>
+            Inicialmente usamos el <strong>ESP32</strong> para el escaneo de redes Wi-Fi y
+            el procesamiento de voz — pero rápidamente encontramos sus límites.
+            La complejidad de escanear direcciones MAC de múltiples Access Points simultáneamente,
+            procesar audio y gestionar las respuestas auditivas en tiempo real superaba la
+            capacidad de procesamiento del microcontrolador.
+          </p>
+          <p>
+            La solución: nos prestaron una <strong>Raspberry Pi</strong>, una mini-PC completa
+            que pasó a ser el cerebro real del sistema. Con Linux corriendo en la palma de la mano,
+            pudimos ejecutar algoritmos más complejos, gestionar múltiples módulos en paralelo
+            y lograr la respuesta en tiempo real que necesitábamos.
+            <strong>El ESP32 quedó como módulo de escaneo Wi-Fi</strong>, haciendo lo que mejor
+            sabe hacer, mientras la Raspberry Pi coordinaba todo.
+          </p>
+          <p>
+            Todo esto, <strong>sin depender de internet</strong>. Procesamiento local,
+            baja latencia, alta autonomía. Edge Computing aplicado a accesibilidad universitaria.
+          </p>
+        </div>
+      </div>
+
+      <div class="media-container reveal" data-delay="2">
+        <div class="img-pair">
+          <div class="media-wrap">
+            <img src="ListenMove/componente1.jpeg" alt="Componentes internos 1" />
+          </div>
+          <div class="media-wrap">
+            <img src="ListenMove/componente2.jpeg" alt="Componentes internos 2" />
+          </div>
+        </div>
+        <div class="media-label">Ensamble de componentes internos</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+
+    <!-- Specs -->
+    <div class="specs-row reveal">
+      <div class="spec-card">
+        <div class="spec-icon">🖥️</div>
+        <div class="spec-name">Procesador principal</div>
+        <div class="spec-val">Raspberry Pi — Linux · Edge Computing</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-icon">📡</div>
+        <div class="spec-name">Módulo Wi-Fi</div>
+        <div class="spec-val">ESP32 — Escaneo RSSI + MAC Address</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-icon">🎙️</div>
+        <div class="spec-name">Entrada</div>
+        <div class="spec-val">Micrófono INMP441 · GPS NEO-6M · Botón físico</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-icon">🔊</div>
+        <div class="spec-name">Salida</div>
+        <div class="spec-val">DAC MAX98357A + Altavoz · Respuestas auditivas</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FASE 4: PRUEBAS ── -->
+  <section class="proj-section">
+    <div class="section-eyebrow">04 // Pruebas</div>
+    <h2 class="prose-title reveal">El momento<br><span class="hl">de la verdad.</span></h2>
+
+    <div class="prose reveal" style="margin-bottom: 3rem;">
+      <p>
+        Las pruebas se realizaron en el campus real de la UAO. Se mapearon los puntos de acceso Wi-Fi
+        de múltiples zonas — salas, pasillos, laboratorios, sótanos — identificando cada uno
+        por su dirección MAC única. Al acercarse a una zona, el dispositivo reconocía el AP más fuerte
+        y reproducía la indicación auditiva correspondiente: <em>"Estás en el Salón 2206"</em>,
+        <em>"Acceso al Infolab"</em>, <em>"Pasillo Audio Pro, Sótano 2"</em>.
+      </p>
+      <p>
+        <strong>Funcionó.</strong> Las señales fueron consistentes, la localización precisa,
+        y la respuesta auditiva clara y comprensible. No fue perfecto — ningún primer prototipo lo es —
+        pero fue real, fue tangible, y fue nuestro.
+      </p>
+    </div>
+
+    <div class="pruebas-pair reveal">
+      <!-- Prueba 1 -->
+      <div class="media-container">
+        <div class="video-player" data-vid="vid-3">
+          <video id="vid-3" src="ListenMove/Prueba1.mp4" preload="metadata" playsinline></video>
+          <div class="vp-init-overlay" id="vpi-3">
+            <button class="vp-big-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+          </div>
+          <div class="vp-seek-flash" id="vsf-3"></div>
+          <div class="vp-controls">
+            <button class="vp-btn" data-action="rewind" title="-10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            </button>
+            <button class="vp-btn" data-action="playpause">
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="vp-btn" data-action="forward" title="+10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+            </button>
+            <div class="vp-progress" data-action="seek">
+              <div class="vp-progress-fill"></div>
+              <div class="vp-progress-thumb"></div>
+            </div>
+            <span class="vp-time">0:00</span>
+            <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="media-label">Prueba de campo — Campus UAO</div>
+        <div class="media-glow"></div>
+      </div>
+
+      <!-- Prueba 2 -->
+      <div class="media-container">
+        <div class="video-player" data-vid="vid-4">
+          <video id="vid-4" src="ListenMove/Prueba2.mp4" preload="metadata" playsinline></video>
+          <div class="vp-init-overlay" id="vpi-4">
+            <button class="vp-big-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+          </div>
+          <div class="vp-seek-flash" id="vsf-4"></div>
+          <div class="vp-controls">
+            <button class="vp-btn" data-action="rewind" title="-10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            </button>
+            <button class="vp-btn" data-action="playpause">
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="vp-btn" data-action="forward" title="+10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+            </button>
+            <div class="vp-progress" data-action="seek">
+              <div class="vp-progress-fill"></div>
+              <div class="vp-progress-thumb"></div>
+            </div>
+            <span class="vp-time">0:00</span>
+            <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="media-label">Prueba de reconocimiento — Localización Wi-Fi</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CIERRE ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow reveal" style="text-align:center; margin-bottom: 0;">05 // Reflexión</div>
+    <div class="cierre reveal">
+      <div class="cierre-quote">
+        "Lo que pudimos construir<br>
+        <span class="hl">en tiempo limitado,</span><br>
+        con recursos escasos,<br>
+        <span class="hl">y un propósito enorme."</span>
+      </div>
+      <div class="cierre-body">
+        <p>
+          ListenMove no nació de un laboratorio con financiamiento. Nació de un aula, de cinco personas
+          que creyeron que la tecnología tiene la obligación de ser inclusiva. Todo lo que hicimos —
+          cada render, cada cable soldado, cada prueba en el campus — lo hicimos por la comunidad
+          universitaria. Por los estudiantes que merecen moverse con la misma autonomía que los demás.
+        </p>
+        <p>
+          Fue un semestre de aprendizaje real: fallar rápido, iterar, adaptar, y no rendirse.
+          El resultado no es un producto terminado — es la prueba de que es posible.
+          Y eso, en ingeniería, vale más que cualquier render perfecto.
+        </p>
+        <p style="color: var(--accent); margin-top: 1rem;">
+          Una experiencia completamente inolvidable.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── NEXT PROJECT ── -->
+  <a href="index.html#proyectos" class="next-proj">
+    <div>
+      <div class="next-label">← Volver</div>
+      <div class="next-title">Todos los proyectos</div>
+    </div>
+    <div class="next-arrow">→</div>
+  </a>
+
+  <footer class="footer">
+    <span>Santiago Londoño Mendez © 2026</span>
+    <span>Diseñado y codificado por mí.</span>
+  </footer>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox-overlay" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">✕</button>
+    <img id="lightbox-img" src="" alt="" />
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+  /* =====================================================================
+     VIDEO PLAYER — play/pause, seek bar, ±10s rewind/forward, time display
+     ===================================================================== */
+  (function initPlayers() {
+    function fmtTime(s) {
+      if (isNaN(s)) return '0:00';
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60).toString().padStart(2, '0');
+      return m + ':' + sec;
+    }
+
+    function showFlash(flashEl, msg) {
+      flashEl.textContent = msg;
+      flashEl.classList.add('show');
+      clearTimeout(flashEl._t);
+      flashEl._t = setTimeout(() => flashEl.classList.remove('show'), 700);
+    }
+
+    document.querySelectorAll('.video-player').forEach(function(player) {
+      const vidId   = player.dataset.vid;
+      const video   = player.querySelector('video');
+      const initOv  = player.querySelector('.vp-init-overlay');
+      const flashEl = player.querySelector('.vp-seek-flash');
+      const fill    = player.querySelector('.vp-progress-fill');
+      const thumb   = player.querySelector('.vp-progress-thumb');
+      const timeEl  = player.querySelector('.vp-time');
+      const ppBtn   = player.querySelector('[data-action="playpause"]');
+      const iconPlay  = ppBtn ? ppBtn.querySelector('.icon-play')  : null;
+      const iconPause = ppBtn ? ppBtn.querySelector('.icon-pause') : null;
+      const progBar = player.querySelector('[data-action="seek"]');
+
+      if (!video) return;
+
+      /* ── helpers ── */
+      function syncIcons() {
+        if (!iconPlay || !iconPause) return;
+        if (video.paused) {
+          iconPlay.style.display  = 'block';
+          iconPause.style.display = 'none';
+        } else {
+          iconPlay.style.display  = 'none';
+          iconPause.style.display = 'block';
+        }
+      }
+
+      function updateProgress() {
+        if (!video.duration) return;
+        const pct = (video.currentTime / video.duration) * 100;
+        if (fill)  fill.style.width = pct + '%';
+        if (thumb) thumb.style.left = pct + '%';
+        if (timeEl) {
+          timeEl.textContent = fmtTime(video.currentTime) +
+            (video.duration ? ' / ' + fmtTime(video.duration) : '');
+        }
+      }
+
+      /* ── initial play (big overlay button) ── */
+      if (initOv) {
+        const bigBtn = initOv.querySelector('.vp-big-btn');
+        if (bigBtn) {
+          bigBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            video.play().then(function() {
+              initOv.classList.add('hidden');
+              player.classList.add('active');
+              syncIcons();
+            }).catch(console.error);
+          });
+        }
+      }
+
+      /* ── click on video area → toggle play/pause ── */
+      video.addEventListener('click', function() {
+        if (video.paused) {
+          video.play().then(function() { syncIcons(); player.classList.add('active'); });
+        } else {
+          video.pause();
+          syncIcons();
+        }
+      });
+
+      /* ── play/pause button in controls ── */
+      if (ppBtn) {
+        ppBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (video.paused) {
+            video.play().then(function() { syncIcons(); player.classList.add('active'); });
+          } else {
+            video.pause();
+            syncIcons();
+          }
+        });
+      }
+
+      /* ── fullscreen button (toggle) ── */
+      var fsIconEnter = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+      var fsIconExit  = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+
+      player.querySelectorAll('[data-action="fullscreen"]').forEach(function(btn) {
+        var btnSvg = btn.querySelector('svg');
+
+        function updateFsIcon() {
+          var isFs = (document.fullscreenElement === player || document.webkitFullscreenElement === player);
+          if (btnSvg) btnSvg.innerHTML = isFs ? fsIconExit : fsIconEnter;
+          btn.title = isFs ? 'Salir de pantalla completa' : 'Pantalla completa';
+        }
+
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var isFs = (document.fullscreenElement === player || document.webkitFullscreenElement === player);
+          if (isFs) {
+            if (document.exitFullscreen)            document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          } else {
+            if (player.requestFullscreen)            player.requestFullscreen();
+            else if (player.webkitRequestFullscreen) player.webkitRequestFullscreen();
+          }
+        });
+
+        document.addEventListener('fullscreenchange', updateFsIcon);
+        document.addEventListener('webkitfullscreenchange', updateFsIcon);
+      });
+
+      /* ── rewind / forward buttons ── */
+      player.querySelectorAll('[data-action="rewind"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          video.currentTime = Math.max(0, video.currentTime - 10);
+          showFlash(flashEl, '← 10s');
+          updateProgress();
+        });
+      });
+      player.querySelectorAll('[data-action="forward"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          video.currentTime = Math.min(video.duration || 0, video.currentTime + 10);
+          showFlash(flashEl, '+10s →');
+          updateProgress();
+        });
+      });
+
+      /* ── seek bar (click + drag) ── */
+      if (progBar) {
+        let seeking = false;
+        function seekTo(e) {
+          const rect = progBar.getBoundingClientRect();
+          const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          video.currentTime = pct * (video.duration || 0);
+          updateProgress();
+        }
+        progBar.addEventListener('mousedown', function(e) {
+          e.stopPropagation();
+          seeking = true;
+          seekTo(e);
+        });
+        window.addEventListener('mousemove', function(e) {
+          if (seeking) seekTo(e);
+        });
+        window.addEventListener('mouseup', function() { seeking = false; });
+
+        /* touch support */
+        progBar.addEventListener('touchstart', function(e) {
+          e.stopPropagation();
+          seeking = true;
+          seekTo(e.touches[0]);
+        }, { passive: true });
+        window.addEventListener('touchmove', function(e) {
+          if (seeking) seekTo(e.touches[0]);
+        }, { passive: true });
+        window.addEventListener('touchend', function() { seeking = false; });
+      }
+
+      /* ── time update ── */
+      video.addEventListener('timeupdate', updateProgress);
+      video.addEventListener('loadedmetadata', updateProgress);
+
+      /* ── ended → show init overlay again ── */
+      video.addEventListener('ended', function() {
+        if (!video.loop) {
+          initOv && initOv.classList.remove('hidden');
+          syncIcons();
+        }
+      });
+    });
+  })();
+
+  /* =====================================================================
+     LIGHTBOX — click on any .media-wrap img to open fullscreen
+     ===================================================================== */
+  (function initLightbox() {
+    const overlay = document.getElementById('lightbox');
+    const lbImg   = document.getElementById('lightbox-img');
+    const closeBtn = document.getElementById('lightbox-close');
+    if (!overlay || !lbImg) return;
+
+    function open(src, alt) {
+      lbImg.src = src;
+      lbImg.alt = alt || '';
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function close() {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.media-wrap img').forEach(function(img) {
+      img.addEventListener('click', function() { open(img.src, img.alt); });
+    });
+
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay || e.target === lbImg) close();
+    });
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') close();
+    });
+  })();
+  </script>
+</body>
+</html>
