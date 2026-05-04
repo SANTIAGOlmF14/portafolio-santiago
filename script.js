@@ -168,29 +168,26 @@ if (heroSub) {
   const video = document.getElementById('hero-video');
   if (!photo || !video) return;
 
+  const BASE = 'https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/';
   const clips = [
-    'https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Media/Saludo.mp4',
-    'https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Media/paz.mp4',
-    'https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Media/bien.mp4'
+    BASE + 'Media/Saludo.mp4',
+    BASE + 'Media/paz.mp4',
+    BASE + 'Media/bien.mp4'
   ];
 
-  // Tiempo que la imagen permanece visible (ms)
-  const DISPLAY_TIME = 10000; // 10 segundos
-
-  // Cuánto antes del cambio se empieza a precargar el siguiente clip (ms)
-  // Debe ser > tiempo de carga del video. Con archivos locales 3 s sobra.
-  const PRELOAD_AHEAD = 3000;
-
-  // Duración del crossfade (debe coincidir con la transition del CSS: 1s)
-  const FADE_MS = 1000;
+  // Tiempo que la foto permanece visible antes de intentar el video (ms)
+  const DISPLAY_TIME  = 12000; // 12 s — da margen para la descarga remota
+  // Cuánto antes de DISPLAY_TIME se empieza la precarga (ms)
+  const PRELOAD_AHEAD = 9000;  // 9 s de ventana para descargar desde GitHub LFS
+  // Timeout máximo de espera por `loadeddata` antes de saltarse el clip (ms)
+  const LOAD_TIMEOUT  = 15000;
 
   let lastIndex = -1;
-  let displayTimer  = null;
-  let preloadTimer  = null;
+  let pendingSrc = null;       // src que se preloadea silenciosamente
   let isTransitioning = false;
 
-  /* ── Elige un clip diferente al anterior ── */
-  function pickClip() {
+  /* ── Elige un índice distinto al anterior ── */
+  function pickIndex() {
     if (clips.length === 1) return 0;
     let idx;
     do { idx = Math.floor(Math.random() * clips.length); } while (idx === lastIndex);
@@ -198,94 +195,94 @@ if (heroSub) {
     return idx;
   }
 
-  /* ── Precarga: asigna src y espera a tener el primer frame listo ──
-     Devuelve una Promise que resuelve cuando el frame está en GPU. */
+  /* ── Precarga un clip: asigna src y espera el primer frame.
+     Resuelve cuando readyState >= 2 (HAVE_CURRENT_DATA).
+     Rechaza si hay error o se supera LOAD_TIMEOUT. ── */
   function preloadClip(src) {
     return new Promise((resolve, reject) => {
-      // Si ya está cargado el mismo src, simplemente rebobina
-      if (video.src.endsWith(src) && video.readyState >= 2) {
+      // Ya está cargado exactamente este src → solo rebobina
+      if (video.src === src && video.readyState >= 2) {
         video.currentTime = 0;
-        video.addEventListener('seeked', () => resolve(), { once: true });
+        const onSeeked = () => resolve();
+        video.addEventListener('seeked', onSeeked, { once: true });
         return;
       }
 
-      video.src = src;
-      video.load();
+      let timer = setTimeout(() => {
+        video.removeEventListener('loadeddata', onData);
+        video.removeEventListener('error', onErr);
+        reject(new Error('[HeroSlideshow] timeout: ' + src));
+      }, LOAD_TIMEOUT);
 
-      // `loadeddata` = el primer frame está disponible para mostrar
-      video.addEventListener('loadeddata', function onLoaded() {
-        video.removeEventListener('loadeddata', onLoaded);
-        // Forzamos ir al frame 0 y esperamos `seeked` para confirmar que
-        // el frame está pintado en el buffer antes de hacer el crossfade.
+      function cleanup() { clearTimeout(timer); }
+
+      function onData() {
+        cleanup();
         video.currentTime = 0;
         video.addEventListener('seeked', () => resolve(), { once: true });
-      }, { once: true });
+      }
+      function onErr() {
+        cleanup();
+        reject(new Error('[HeroSlideshow] error cargando: ' + src));
+      }
 
-      video.addEventListener('error', () => reject(new Error('Error cargando: ' + src)), { once: true });
+      video.addEventListener('loadeddata', onData, { once: true });
+      video.addEventListener('error',      onErr,  { once: true });
+      video.src = src;
+      video.load();
     });
   }
 
-  /* ── Ejecuta el crossfade foto → video ── */
+  /* ── Crossfade foto → video ── */
   function crossfadeToVideo() {
     if (isTransitioning) return;
     isTransitioning = true;
 
-    const src = clips[pickClip()];
+    // Usa el clip precargado si está listo, o elige uno nuevo
+    const src = (pendingSrc && video.src === pendingSrc && video.readyState >= 2)
+      ? pendingSrc
+      : clips[pickIndex()];
+    pendingSrc = null;
 
     preloadClip(src)
       .then(() => {
-        // El primer frame está listo en GPU: inicia reproducción y fade
         video.play().catch(() => {});
-
-        // Sube el video, baja la foto — la GPU hace el blend sin parpadeo
         video.style.opacity = '1';
         photo.style.opacity = '0';
-
-        // Espera a que termine el clip
         video.addEventListener('ended', onVideoEnded, { once: true });
-
         isTransitioning = false;
       })
       .catch(err => {
-        console.warn('[HeroSlideshow]', err);
+        console.warn(err);
         isTransitioning = false;
-        scheduleNext(); // reintenta el ciclo si hay error
+        scheduleNext(); // saltar este clip y volver a la foto
       });
   }
 
-  /* ── Cuando el video termina, vuelve a la foto ── */
+  /* ── Video terminó → vuelve a la foto ── */
   function onVideoEnded() {
-    // Sube la foto, baja el video — la foto ya estaba renderizada, sin flash
     photo.style.opacity = '1';
     video.style.opacity = '0';
-
-    // Pausa y rebobina sin limpiar el src (limpiar src causa el flash)
     video.pause();
-    video.currentTime = 0;
-
-    // Programa la siguiente aparición del video
+    // NO limpiamos video.src para evitar flash negro
     scheduleNext();
   }
 
-  /* ── Programa el siguiente ciclo:
-        - Inicia la precarga PRELOAD_AHEAD ms antes del cambio visual
-        - Lanza el crossfade cuando se cumple DISPLAY_TIME ── */
+  /* ── Programa el próximo ciclo ── */
   function scheduleNext() {
-    // Timer de precarga: carga el video en silencio antes de mostrarlo
-    preloadTimer = setTimeout(() => {
-      const src = clips[pickClip()];
-      // Precarga sin modificar la opacidad
-      preloadClip(src).catch(() => {});
-      // Ajusta lastIndex para que crossfadeToVideo use el mismo clip
-      // (preloadClip ya lo habrá cargado cuando se llame)
-      lastIndex = clips.indexOf(src);
+    // Precarga silenciosa con PRELOAD_AHEAD de anticipación
+    setTimeout(() => {
+      const idx = pickIndex();
+      pendingSrc = clips[idx];
+      lastIndex  = idx;
+      preloadClip(pendingSrc).catch(() => { pendingSrc = null; });
     }, DISPLAY_TIME - PRELOAD_AHEAD);
 
-    // Timer principal: dispara el crossfade
-    displayTimer = setTimeout(crossfadeToVideo, DISPLAY_TIME);
+    // Dispara el crossfade al cumplirse DISPLAY_TIME
+    setTimeout(crossfadeToVideo, DISPLAY_TIME);
   }
 
-  // Arranca el ciclo
+  // Arranca
   scheduleNext();
 })();
 
