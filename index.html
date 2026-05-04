@@ -291,14 +291,19 @@
         </div>
       </div>
       <div class="proyecto-card reveal" data-delay="3">
-        <div class="proyecto-img">
-          <div class="proyecto-placeholder">📁 assets/proyecto4.jpg</div>
-          <div class="proyecto-overlay"><a href="#" class="proyecto-link">Ver más →</a></div>
+        <div class="proyecto-img" style="position:relative; overflow:hidden; background:#040c10;">
+          <img id="ze-slide-1" src="Zeida/web.png" alt="Maquinas Virtuales — Sitio web principal"
+            style="width:100%;height:100%;object-fit:cover;object-position:center top;position:absolute;inset:0;opacity:1;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="ze-slide-2" src="Zeida/correo.png" alt="Maquinas Virtuales — Sistema de correo"
+            style="width:100%;height:100%;object-fit:cover;object-position:center top;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="ze-slide-3" src="Zeida/Proxy.png" alt="Maquinas Virtuales — Proxy Squid"
+            style="width:100%;height:100%;object-fit:cover;object-position:center top;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <div class="proyecto-overlay"><a href="zeida.html" class="proyecto-link">Ver más →</a></div>
         </div>
         <div class="proyecto-info">
-          <span class="proyecto-tag">HTML · CSS · JS</span>
-          <h3>Nombre del Proyecto 4</h3>
-          <p>Descripción del cuarto proyecto.</p>
+          <span class="proyecto-tag">Linux · BIND9 · Apache · Nginx · Postfix · Squid</span>
+          <h3>Maquinas Virtuales — Infraestructura de Red</h3>
+          <p>Dos servidores virtuales Ubuntu con DNS, hosting web, correo corporativo, proxy con bloqueo de redes sociales y firewall. Un parcial universitario hecho proyecto real.</p>
         </div>
       </div>
     </div>
@@ -511,6 +516,22 @@
         cur = (cur + 1) % slides.length;
         slides[cur].style.opacity = '1';
       }, 3200);
+    })();
+
+    /* ── Zeida card slideshow (3 imágenes) ── */
+    (function zeSlide() {
+      const slides = [
+        document.getElementById('ze-slide-1'),
+        document.getElementById('ze-slide-2'),
+        document.getElementById('ze-slide-3'),
+      ];
+      if (!slides[0]) return;
+      let cur = 0;
+      setInterval(() => {
+        slides[cur].style.opacity = '0';
+        cur = (cur + 1) % slides.length;
+        slides[cur].style.opacity = '1';
+      }, 3400);
     })();
 
     /* ── ListenMove card slideshow ── */

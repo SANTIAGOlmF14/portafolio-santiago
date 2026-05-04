@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Maquinas Virtuales — Infraestructura de Red | SLM</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    /* ===== PROYECTO DETAIL PAGE ===== */
+    .proj-hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 4rem 5rem;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .proj-hero-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 60% 30%, rgba(0,245,196,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(123,97,255,0.06) 0%, transparent 50%);
+      z-index: 0;
+    }
+    .proj-hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,245,196,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,196,.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+    .proj-hero-visual {
+      position: absolute; inset: 0; z-index: 0;
+    }
+    .proj-hero-visual img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      opacity: 0.06;
+      filter: grayscale(60%) contrast(1.3);
+    }
+    .proj-hero-content {
+      position: relative; z-index: 2; max-width: 800px;
+    }
+    .back-link {
+      display: inline-flex; align-items: center; gap: .6rem;
+      font-size: .7rem; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 3rem;
+      transition: color .2s; cursor: none;
+    }
+    .back-link:hover { color: var(--accent); }
+    .back-link .arrow { font-size: 1rem; transition: transform .2s; }
+    .back-link:hover .arrow { transform: translateX(-4px); }
+    .proj-category {
+      font-size: .7rem; letter-spacing: 4px; color: var(--accent);
+      text-transform: uppercase; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .proj-category::before {
+      content: ''; display: block; width: 30px; height: 1px;
+      background: var(--accent);
+    }
+    .proj-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 6vw, 5.5rem);
+      font-weight: 900; line-height: .95;
+      letter-spacing: -2px; margin-bottom: 1.5rem;
+    }
+    .proj-title span {
+      display: block; color: transparent;
+      -webkit-text-stroke: 2px var(--accent);
+    }
+    .proj-subtitle {
+      font-size: .9rem; color: var(--text-muted);
+      max-width: 550px; line-height: 1.8; margin-bottom: 2.5rem;
+    }
+    .proj-meta { display: flex; gap: 2.5rem; flex-wrap: wrap; }
+    .proj-meta-item { display: flex; flex-direction: column; gap: .25rem; }
+    .proj-meta-label { font-size: .6rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; }
+    .proj-meta-val { font-size: .82rem; color: var(--accent); font-family: var(--font-display); font-weight: 700; }
+    .proj-scroll-hint {
+      position: absolute; right: 4rem; bottom: 3rem;
+      display: flex; flex-direction: column; align-items: center;
+      gap: .8rem; font-size: .6rem; letter-spacing: 3px;
+      color: var(--text-muted); text-transform: uppercase; z-index: 2;
+    }
+    .proj-scroll-line {
+      width: 1px; height: 60px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity:.4; transform: scaleY(1); }
+      50% { opacity:1; transform: scaleY(1.2); }
+    }
+
+    /* ===== SECTIONS ===== */
+    .proj-section {
+      position: relative; z-index: 1; padding: 6rem 4rem;
+    }
+    .proj-section--dark {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .section-eyebrow {
+      font-size: .65rem; letter-spacing: 4px;
+      color: var(--accent); text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .prose-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 700; margin-bottom: 2rem;
+      letter-spacing: -1px; line-height: 1.1;
+    }
+    .prose-title .hl { color: var(--accent); }
+    .prose {
+      max-width: 680px; color: var(--text-muted);
+      font-size: .88rem; line-height: 1.9;
+    }
+    .prose p { margin-bottom: 1.2rem; }
+    .prose strong { color: var(--text); }
+
+    /* ===== ARQUITECTURA / SPECS ===== */
+    .specs-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .spec-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      transition: all .3s;
+      position: relative; overflow: hidden;
+    }
+    .spec-card::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform: scaleX(0); transform-origin: left; transition: transform .4s;
+    }
+    .spec-card:hover::before { transform: scaleX(1); }
+    .spec-card:hover { border-color: rgba(0,245,196,.4); transform: translateY(-4px); }
+    .spec-icon { font-size: 1.5rem; margin-bottom: .8rem; }
+    .spec-name {
+      font-family: var(--font-display);
+      font-size: .7rem; letter-spacing: 1px;
+      margin-bottom: .4rem; color: var(--accent);
+    }
+    .spec-val { font-size: .75rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* ===== FASE BLOCK ===== */
+    .fase-block {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: start; margin-top: 3rem;
+    }
+    .fase-block.reverse { direction: rtl; }
+    .fase-block.reverse > * { direction: ltr; }
+    .fase-num {
+      font-family: var(--font-display); font-size: 4rem;
+      font-weight: 900; color: var(--border);
+      line-height: 1; margin-bottom: .5rem;
+    }
+    .fase-label { font-size: .6rem; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: .8rem; }
+    .fase-title { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; }
+    .fase-body { font-size: .85rem; color: var(--text-muted); line-height: 1.9; }
+    .fase-body p { margin-bottom: 1rem; }
+    .fase-body strong { color: var(--text); }
+    .media-container { position: relative; }
+    .media-wrap { position: relative; overflow: hidden; }
+    .media-wrap img { width: 100%; display: block; border: 1px solid var(--border); cursor: zoom-in; transition: filter .3s; }
+    .media-wrap img:hover { filter: brightness(1.08); }
+    .media-label {
+      font-size: .6rem; letter-spacing: 2px; color: var(--text-muted);
+      text-transform: uppercase; margin-top: .9rem;
+      border-left: 2px solid var(--accent); padding-left: .7rem;
+    }
+    .media-glow {
+      position: absolute; inset: -1px;
+      border: 1px solid var(--accent); opacity: .2;
+      pointer-events: none; transform: translate(8px, 8px);
+      transition: transform .4s;
+    }
+    .media-container:hover .media-glow { transform: translate(4px, 4px); }
+
+    /* ===== IMG GRID (3 imágenes) ===== */
+    .img-trio {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem; margin-top: 2.5rem;
+    }
+    .img-trio .media-wrap img { height: 220px; object-fit: cover; object-position: center top; }
+
+    /* ===== VIDEO PLAYER ===== */
+    .video-player {
+      position: relative; background: #000;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      width: 100%;
+    }
+    .video-player video {
+      display: block; width: 100%;
+      height: auto;
+      max-height: 70vh;
+      object-fit: contain;
+      background: #000;
+    }
+    .video-player:-webkit-full-screen,
+    .video-player:fullscreen {
+      background: #000; width: 100vw !important; height: 100vh !important;
+      display: flex; align-items: center; justify-content: center;
+      cursor: default;
+    }
+    .video-player:-webkit-full-screen video,
+    .video-player:fullscreen video {
+      width: 100vw !important; height: 100vh !important;
+      object-fit: contain !important; max-height: 100vh;
+      cursor: default;
+    }
+    .video-player:-webkit-full-screen .vp-controls,
+    .video-player:fullscreen .vp-controls {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      z-index: 99999; opacity: 1; cursor: default;
+    }
+    .video-player:-webkit-full-screen .vp-btn,
+    .video-player:fullscreen .vp-btn { cursor: pointer; }
+    .vp-init-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(8,11,16,.55);
+      z-index: 5; transition: opacity .3s;
+    }
+    .vp-init-overlay.hidden { opacity: 0; pointer-events: none; }
+    .vp-big-btn {
+      width: 64px; height: 64px; border-radius: 50%;
+      border: 2px solid var(--accent); background: none;
+      color: var(--accent); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background .2s, transform .2s;
+    }
+    .vp-big-btn:hover { background: rgba(0,245,196,.15); transform: scale(1.08); }
+    .vp-controls {
+      display: flex; align-items: center; gap: .5rem;
+      padding: .5rem .8rem .6rem;
+      background: linear-gradient(transparent, rgba(0,0,0,.85));
+      position: absolute; bottom: 0; left: 0; right: 0;
+      opacity: 0; transition: opacity .25s;
+      z-index: 6;
+    }
+    .video-player:hover .vp-controls,
+    .video-player.active .vp-controls { opacity: 1; }
+    .vp-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--accent); padding: 2px;
+      display: flex; align-items: center; justify-content: center;
+      transition: color .15s, transform .15s;
+    }
+    .vp-btn:hover { transform: scale(1.15); }
+    .vp-progress {
+      flex: 1; position: relative; height: 4px;
+      background: rgba(255,255,255,.2); border-radius: 2px; cursor: pointer;
+    }
+    .vp-progress-fill {
+      position: absolute; top: 0; left: 0;
+      height: 100%; width: 0%; background: var(--accent);
+      border-radius: 2px; pointer-events: none; transition: width .1s linear;
+    }
+    .vp-progress-thumb {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 12px; height: 12px; background: var(--accent);
+      border-radius: 50%; margin-left: -6px;
+      pointer-events: none; transition: left .1s linear;
+      box-shadow: 0 0 6px rgba(0,245,196,.6);
+    }
+    .vp-time {
+      font-size: .6rem; letter-spacing: 1px;
+      color: var(--text-muted); white-space: nowrap;
+      flex-shrink: 0; min-width: 72px; text-align: right;
+    }
+    .vp-seek-flash {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-display); font-size: .75rem;
+      letter-spacing: 2px; color: var(--accent);
+      background: rgba(8,11,16,.7); padding: .4rem .9rem;
+      border: 1px solid var(--border); pointer-events: none;
+      opacity: 0; transition: opacity .2s; z-index: 6; white-space: nowrap;
+    }
+    .vp-seek-flash.show { opacity: 1; }
+    .vp-volume-wrap { display: flex; align-items: center; gap: .4rem; flex-shrink: 0; }
+    .vp-volume-slider {
+      -webkit-appearance: none; appearance: none;
+      width: 60px; height: 3px; border-radius: 2px; cursor: pointer;
+      background: linear-gradient(to right, var(--accent) var(--vol, 100%), rgba(255,255,255,.2) var(--vol, 100%));
+      outline: none; border: none; flex-shrink: 0;
+    }
+    .vp-volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 11px; height: 11px;
+      border-radius: 50%; background: var(--accent); cursor: pointer;
+      box-shadow: 0 0 5px rgba(0,245,196,.5);
+    }
+    .vp-btn.vp-fs { margin-left: auto; }
+
+    /* ===== LIGHTBOX ===== */
+    .lightbox-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.92);
+      z-index: 9999; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .3s; cursor: zoom-out;
+    }
+    .lightbox-overlay.active { opacity: 1; pointer-events: all; }
+    .lightbox-overlay img { max-width: 92vw; max-height: 90vh; object-fit: contain; border: 1px solid rgba(0,245,196,.3); box-shadow: 0 0 60px rgba(0,245,196,.15); }
+    .lightbox-close {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      background: none; border: 1px solid rgba(0,245,196,.4);
+      color: var(--accent); font-size: 1.2rem;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .2s;
+    }
+    .lightbox-close:hover { background: var(--accent); color: var(--bg); }
+
+    /* ===== CIERRE ===== */
+    .cierre {
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 3rem; position: relative; overflow: hidden;
+      max-width: 760px; margin: 3rem auto 0; text-align: center;
+    }
+    .cierre::before {
+      content: ''; position: absolute; inset: -1px;
+      background: linear-gradient(135deg, rgba(0,245,196,.15), transparent, rgba(123,97,255,.15));
+      pointer-events: none;
+    }
+    .cierre-quote {
+      font-family: var(--font-display);
+      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      line-height: 1.4; margin-bottom: 1.5rem; letter-spacing: -.5px;
+    }
+    .cierre-quote .hl { color: var(--accent); }
+    .cierre-body {
+      color: var(--text-muted); font-size: .83rem;
+      line-height: 1.9; max-width: 580px; margin: 0 auto;
+    }
+
+    /* ===== NEXT / BACK ===== */
+    .next-proj {
+      border-top: 1px solid var(--border); padding: 4rem;
+      display: flex; align-items: center; justify-content: space-between;
+      position: relative; z-index: 1;
+    }
+    .next-proj-back, .next-proj-forward {
+      display: flex; align-items: center; gap: 1.5rem;
+      text-decoration: none; padding: 1rem 1.5rem;
+      transition: background .3s; cursor: none;
+    }
+    .next-proj-back:hover, .next-proj-forward:hover { background: var(--bg2); }
+    .next-label { font-size: .65rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; margin-bottom: .5rem; }
+    .next-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--text); transition: color .3s; }
+    .next-proj-back:hover .next-title, .next-proj-forward:hover .next-title { color: var(--accent); }
+    .next-arrow { font-size: 2rem; color: var(--accent); transition: transform .3s; }
+    .next-arrow-left { font-size: 2rem; color: var(--accent); transition: transform .3s; }
+    .next-proj-back:hover .next-arrow-left { transform: translateX(-8px); }
+    .next-proj-forward:hover .next-arrow { transform: translateX(8px); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .proj-hero { padding: 0 1.5rem 4rem; }
+      .proj-scroll-hint { display: none; }
+      .proj-section { padding: 4rem 1.5rem; }
+      .fase-block { grid-template-columns: 1fr; gap: 2.5rem; }
+      .fase-block.reverse { direction: ltr; }
+      .specs-row { grid-template-columns: repeat(2, 1fr); }
+      .img-trio { grid-template-columns: 1fr; }
+      .next-proj { padding: 1.5rem; flex-direction: column; gap: 1rem; }
+      .next-proj-back, .next-proj-forward { width: 100%; justify-content: space-between; }
+    }
+    @media (max-width: 480px) {
+      .specs-row { grid-template-columns: 1fr; }
+      .proj-meta { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor"></div>
+  <div class="cursor-trail"></div>
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">SLM<span class="dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html#sobre-mi">Sobre mí</a></li>
+      <li><a href="index.html#habilidades">Skills</a></li>
+      <li><a href="index.html#proyectos">Proyectos</a></li>
+      <li><a href="index.html#contacto">Contacto</a></li>
+    </ul>
+    <div class="nav-status">
+      <span class="status-dot"></span> Open to work
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="proj-hero">
+    <div class="proj-hero-bg"></div>
+    <div class="proj-hero-grid"></div>
+    <div class="proj-hero-visual">
+      <img src="Zeida/web.png" alt="Maquinas Virtuales web" />
+    </div>
+
+    <div class="proj-hero-content">
+      <a href="index.html#proyectos" class="back-link">
+        <span class="arrow">←</span> Volver a proyectos
+      </a>
+      <div class="proj-category">DNS · Apache · Nginx · Squid · Postfix · Dovecot · Firewall</div>
+      <h1 class="proj-title">
+        MAQUINAS
+        <span>VIRTUALES</span>
+      </h1>
+      <p class="proj-subtitle">
+        Infraestructura de red completa sobre dos servidores virtuales — DNS, hosting web,
+        correo electrónico, proxy con bloqueo de redes sociales y firewall.
+        Un parcial universitario convertido en broma, convertido en proyecto real.
+      </p>
+      <div class="proj-meta">
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Año</span>
+          <span class="proj-meta-val">2025</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Rol</span>
+          <span class="proj-meta-val">Desarrollo completo</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Tech</span>
+          <span class="proj-meta-val">Linux · BIND9 · Apache · Nginx · Postfix · Squid</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Tipo</span>
+          <span class="proj-meta-val">Infraestructura de Red</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-scroll-hint">
+      <span>scroll</span>
+      <div class="proj-scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ── INTRO ── -->
+  <section class="proj-section reveal">
+    <div class="section-eyebrow">00 // El proyecto</div>
+    <h2 class="prose-title">Una broma.<br><span class="hl">Una infraestructura real.</span></h2>
+    <div class="prose">
+      <p>
+        El parcial pedía crear una empresa de hosting con un dominio propio. Tenía que elegir
+        nombre. Mi profesora se llamaba Zeida. La respuesta fue obvia: <strong>ZeidaTeAmo.com</strong>.
+      </p>
+      <p>
+        Lo que empezó como un chiste se convirtió en uno de los proyectos técnicos más completos
+        que he construido: dos máquinas virtuales Ubuntu 22.04 sobre VirtualBox con Vagrant,
+        interconectadas en una red privada clase B, con servicios reales corriendo en producción.
+        DNS autoritativo, sitio web en Apache, clientes en Nginx, proxy Squid con bloqueo de
+        redes sociales, servidor de correo con Postfix y Dovecot, y firewall con UFW.
+      </p>
+     
+    </div>
+
+    <!-- SPECS: Arquitectura -->
+    <div class="specs-row reveal">
+      <div class="spec-card">
+        <div class="spec-icon">🖥</div>
+        <div class="spec-name">Servidor 1</div>
+        <div class="spec-val">DNS (BIND9) · Apache · Squid · Firewall UFW<br/>IP: 172.16.100.2</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-icon">📡</div>
+        <div class="spec-name">Servidor 2</div>
+        <div class="spec-val">Nginx · Postfix · Dovecot · Webmin<br/>IP: 172.16.100.3</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-icon">🌐</div>
+        <div class="spec-name">Dominio</div>
+        <div class="spec-val">zeidateamo.com<br/>zeidateamo-clientedos.com<br/>zeidateamo-clientetres.com</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-icon">⚙️</div>
+        <div class="spec-name">Entorno</div>
+        <div class="spec-val">Vagrant · VirtualBox<br/>Ubuntu 22.04 LTS<br/>Red privada clase B</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BLOQUE 1: DNS y WEB ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">01 // DNS y sitio principal</div>
+    <h2 class="prose-title reveal">Nombres que resuelven.<br><span class="hl">Un dominio que existe.</span></h2>
+
+    <div class="fase-block">
+      <div class="fase-text reveal">
+        <div class="fase-num">01</div>
+        <div class="fase-label">DNS — BIND9 en Servidor 1</div>
+        <h3 class="fase-title">El servidor de nombres</h3>
+        <div class="fase-body">
+          <p>
+            Configuré BIND9 en el Servidor 1 como servidor DNS autoritativo para tres zonas:
+            <strong>zeidateamo.com</strong>, <strong>zeidateamo-clientedos.com</strong> y
+            <strong>zeidateamo-clientetres.com</strong>. Cada zona tiene sus registros A, NS y MX
+            correctamente definidos.
+          </p>
+          <p>
+            La clave del parcial era demostrar que acceder por IP muestra una página diferente
+            (un "Hola Mundo") a la que aparece al usar el dominio. Eso se logró configurando
+            un VirtualHost en Apache con <strong>ServerName zeidateamo.com</strong>, mientras
+            la IP devuelve el default del servidor.
+          </p>
+          <p>
+            El DNS responde con <code>status: NOERROR</code> en todas las consultas con <code>dig</code>,
+            resuelve correctamente desde ambos servidores y apunta las IPs internas de la red privada.
+          </p>
+        </div>
+      </div>
+
+      <div class="media-container reveal" data-delay="2">
+        <div class="media-wrap">
+          <img src="Zeida/web.png" alt="Sitio web ZeidaTeAmo — Vista principal" id="zeida-web-img" />
+        </div>
+        <div class="media-label">Sitio principal — zeidateamo.com servido por Apache</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BLOQUE 2: CORREO ── -->
+  <section class="proj-section reveal">
+    <div class="section-eyebrow">02 // Correo electrónico</div>
+    <h2 class="prose-title">Postfix + Dovecot.<br><span class="hl">Correo real, dominio propio.</span></h2>
+
+    <div class="fase-block reverse">
+      <div class="fase-text reveal">
+        <div class="fase-num">02</div>
+        <div class="fase-label">Servidor de correo — Servidor 2</div>
+        <h3 class="fase-title">El sistema de correo</h3>
+        <div class="fase-body">
+          <p>
+            Configuré <strong>Postfix</strong> como MTA (agente de transferencia de correo) y
+            <strong>Dovecot</strong> como servidor IMAP/POP3, asociados al dominio
+            <strong>zeidateamo-clientetres.com</strong>. El sistema usa Maildir para almacenar
+            los correos de cada usuario.
+          </p>
+          <p>
+            Se crearon dos cuentas virtuales: <code>santiago@zeidateamo-clientetres.com</code>
+            y <code>goku@zeidateamo-clientetres.com</code>. Ambas cuentas pueden enviarse
+            correos entre sí, verificado a través del webmail integrado en el sitio del cliente.
+          </p>
+          <p>
+            La cola de Postfix funciona limpia (<code>Mail queue is empty</code>) y los buzones
+            Maildir muestran los correos recibidos correctamente. Todo accesible desde el sitio
+            web del Cliente 3 mediante un hipervínculo directo.
+          </p>
+        </div>
+      </div>
+
+      <div class="media-container reveal">
+        <div class="media-wrap">
+          <img src="Zeida/correo.png" alt="Sistema de correo — Webmail ZeidaTeAmo" id="zeida-correo-img" />
+        </div>
+        <div class="media-label">Webmail — correo entre cuentas del mismo dominio</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BLOQUE 3: PROXY ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">03 // Proxy y control de acceso</div>
+    <h2 class="prose-title reveal">Squid en acción.<br><span class="hl">Las redes sociales, bloqueadas.</span></h2>
+
+    <div class="fase-block">
+      <div class="fase-text reveal">
+        <div class="fase-num">03</div>
+        <div class="fase-label">Proxy Squid — Servidor 1</div>
+        <h3 class="fase-title">El filtro de contenido</h3>
+        <div class="fase-body">
+          <p>
+            El Cliente 2 requería bloquear el acceso a redes sociales desde su red interna.
+            Configuré <strong>Squid</strong> en el Servidor 1 como proxy HTTP en el puerto 3128,
+            apuntando a la IP <code>172.16.100.2</code>.
+          </p>
+          <p>
+            Las reglas del proxy bloquean dominios como <strong>facebook.com</strong> e
+            <strong>instagram.com</strong>, mientras permiten el tráfico normal y el acceso
+            a los sitios internos de la empresa. En el equipo cliente se configura el proxy
+            manualmente con la IP y puerto, y se excluyen los dominios internos de la
+            restricción proxy.
+          </p>
+          <p>
+            El resultado: intentar entrar a Facebook o Instagram desde la red del cliente
+            muestra un error de acceso denegado, mientras las búsquedas normales y el sitio
+            propio de ZeidaTeAmo funcionan sin problema.
+          </p>
+        </div>
+      </div>
+
+      <div class="media-container reveal" data-delay="2">
+        <div class="media-wrap">
+          <img src="Zeida/Proxy.png" alt="Configuración del proxy Squid" id="zeida-proxy-img" />
+        </div>
+        <div class="media-label">Configuración del proxy — IP 172.16.100.2 · Puerto 3128</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── GALERÍA 3 IMÁGENES ── -->
+  <section class="proj-section reveal">
+    <div class="section-eyebrow">04 // Evidencias</div>
+    <h2 class="prose-title">Lo que quedó<br><span class="hl">funcionando.</span></h2>
+
+    <div class="img-trio reveal">
+      <div class="media-wrap" data-img="Zeida/web.png">
+        <img src="Zeida/web.png" alt="Sitio principal ZeidaTeAmo" />
+        <div style="font-size:.6rem;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-top:.7rem;border-left:2px solid var(--accent);padding-left:.7rem;">Web principal</div>
+      </div>
+      <div class="media-wrap" data-img="Zeida/correo.png">
+        <img src="Zeida/correo.png" alt="Sistema de correo" />
+        <div style="font-size:.6rem;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-top:.7rem;border-left:2px solid var(--accent);padding-left:.7rem;">Correo corporativo</div>
+      </div>
+      <div class="media-wrap" data-img="Zeida/Proxy.png">
+        <img src="Zeida/Proxy.png" alt="Configuración proxy" />
+        <div style="font-size:.6rem;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-top:.7rem;border-left:2px solid var(--accent);padding-left:.7rem;">Proxy Squid activo</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VIDEO 1: DEMO WEB COMPLETA ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">05 // Demo en vivo</div>
+    <h2 class="prose-title reveal">Todo el sistema.<br><span class="hl">En un solo recorrido.</span></h2>
+
+    <div class="prose reveal" style="margin-bottom: 2.5rem;">
+      <p>
+        Este video muestra el funcionamiento completo de la infraestructura: acceso por IP vs dominio,
+        navegación entre los sitios de los clientes, zona privada con autenticación básica HTTP,
+        la versión segura HTTPS del Cliente 2, el webmail del Cliente 3 y la confirmación de que
+        el DNS resuelve correctamente todos los registros.
+      </p>
+    </div>
+
+    <div class="reveal" style="max-width: 820px; margin: 0 auto;">
+      <div class="media-container">
+        <div class="video-player" data-vid="vid-web">
+          <video id="vid-web"
+            src="Zeida/webcompleta.mp4"
+            preload="metadata" playsinline></video>
+          <div class="vp-init-overlay" id="vpi-web">
+            <button class="vp-big-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+          </div>
+          <div class="vp-seek-flash" id="vsf-web"></div>
+          <div class="vp-controls">
+            <button class="vp-btn" data-action="rewind" title="-10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            </button>
+            <button class="vp-btn" data-action="playpause" title="Play/Pause">
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="vp-btn" data-action="forward" title="+10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+            </button>
+            <div class="vp-progress" data-action="seek">
+              <div class="vp-progress-fill"></div>
+              <div class="vp-progress-thumb"></div>
+            </div>
+            <span class="vp-time">0:00 / 0:00</span>
+            <div class="vp-volume-wrap">
+              <button class="vp-btn" data-action="mute" title="Silenciar">
+                <svg class="icon-vol" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                <svg class="icon-muted" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19l2 2L21 19.73l-18-18zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+              </button>
+              <input class="vp-volume-slider" type="range" min="0" max="1" step="0.05" value="1" data-action="volume" style="--vol:100%;" />
+            </div>
+            <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="media-label" style="margin-top:.9rem;">Demo completa — DNS, Apache, Nginx, Webmail, HTTPS, zona privada</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VIDEO 2: PROXY BLOQUEANDO REDES SOCIALES ── -->
+  <section class="proj-section reveal">
+    <div class="section-eyebrow">06 // Proxy en acción</div>
+    <h2 class="prose-title">Facebook intenta entrar.<br><span class="hl">El proxy dice que no.</span></h2>
+
+    <div class="prose reveal" style="margin-bottom: 2.5rem;">
+      <p>
+        En este video se ve el proxy Squid funcionando en tiempo real: el navegador tiene configurado
+        el proxy con la IP del Servidor 1 y el puerto 3128. Se intenta acceder a Facebook e Instagram
+        y ambos quedan bloqueados. Luego se demuestra que las búsquedas normales y el sitio
+        ZeidaTeAmo siguen funcionando perfectamente — el bloqueo es selectivo, no un corte total.
+      </p>
+    </div>
+
+    <div class="reveal" style="max-width: 820px; margin: 0 auto;">
+      <div class="media-container">
+        <div class="video-player" data-vid="vid-proxy">
+          <video id="vid-proxy"
+            src="Zeida/haproxy.mp4"
+            preload="metadata" playsinline></video>
+          <div class="vp-init-overlay" id="vpi-proxy">
+            <button class="vp-big-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+          </div>
+          <div class="vp-seek-flash" id="vsf-proxy"></div>
+          <div class="vp-controls">
+            <button class="vp-btn" data-action="rewind" title="-10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            </button>
+            <button class="vp-btn" data-action="playpause" title="Play/Pause">
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="vp-btn" data-action="forward" title="+10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+            </button>
+            <div class="vp-progress" data-action="seek">
+              <div class="vp-progress-fill"></div>
+              <div class="vp-progress-thumb"></div>
+            </div>
+            <span class="vp-time">0:00 / 0:00</span>
+            <div class="vp-volume-wrap">
+              <button class="vp-btn" data-action="mute" title="Silenciar">
+                <svg class="icon-vol" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                <svg class="icon-muted" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19l2 2L21 19.73l-18-18zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+              </button>
+              <input class="vp-volume-slider" type="range" min="0" max="1" step="0.05" value="1" data-action="volume" style="--vol:100%;" />
+            </div>
+            <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="media-label" style="margin-top:.9rem;">Proxy Squid — Facebook e Instagram bloqueados · ZeidaTeAmo accesible</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CIERRE ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="cierre reveal">
+      <div class="cierre-quote">
+        "Lo que empezó como una broma<br>
+        <span class="hl">terminó siendo infraestructura de verdad."</span>
+      </div>
+      <div class="cierre-body">
+        <p>
+          ZeidaTeAmo no es solo un parcial aprobado. Es la demostración de que puedo ir
+          desde cero hasta producción: levantar máquinas, configurar servicios, resolver
+          dominios, asegurar conexiones y bloquear accesos no autorizados.
+        </p>
+        <p style="margin-top:1rem; color:var(--accent); font-family:var(--font-display); font-size:.75rem; letter-spacing:2px; text-transform:uppercase;">
+          — Santiago Londoño Mendez
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── NAVEGACIÓN ENTRE PROYECTOS ── -->
+  <div class="next-proj">
+    <a href="index.html#proyectos" class="next-proj-back">
+      <div class="next-arrow-left">←</div>
+      <div>
+        <div class="next-label">Volver</div>
+        <div class="next-title">Todos los proyectos</div>
+      </div>
+    </a>
+    <a href="apartamento.html" class="next-proj-forward">
+      <div>
+        <div class="next-label">Siguiente proyecto</div>
+        <div class="next-title">Apartamento VR</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </a>
+  </div>
+
+  <footer class="footer">
+    <span>Santiago Londoño Mendez © 2026</span>
+    <span>Diseñado y codificado por mí.</span>
+  </footer>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox-overlay" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">✕</button>
+    <img id="lightbox-img" src="" alt="" />
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+  /* =====================================================================
+     VIDEO PLAYER
+     ===================================================================== */
+  (function initPlayers() {
+    function fmtTime(s) {
+      if (isNaN(s)) return '0:00';
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60).toString().padStart(2, '0');
+      return m + ':' + sec;
+    }
+    function showFlash(flashEl, msg) {
+      if (!flashEl) return;
+      flashEl.textContent = msg;
+      flashEl.classList.add('show');
+      clearTimeout(flashEl._t);
+      flashEl._t = setTimeout(() => flashEl.classList.remove('show'), 700);
+    }
+
+    document.querySelectorAll('.video-player').forEach(function(player) {
+      const video    = player.querySelector('video');
+      const initOv   = player.querySelector('.vp-init-overlay');
+      const flashEl  = player.querySelector('.vp-seek-flash');
+      const fill     = player.querySelector('.vp-progress-fill');
+      const thumb    = player.querySelector('.vp-progress-thumb');
+      const timeEl   = player.querySelector('.vp-time');
+      const ppBtn    = player.querySelector('[data-action="playpause"]');
+      const iconPlay  = ppBtn ? ppBtn.querySelector('.icon-play')  : null;
+      const iconPause = ppBtn ? ppBtn.querySelector('.icon-pause') : null;
+      const progBar  = player.querySelector('[data-action="seek"]');
+      if (!video) return;
+
+      function syncIcons() {
+        if (!iconPlay || !iconPause) return;
+        iconPlay.style.display  = video.paused ? 'block' : 'none';
+        iconPause.style.display = video.paused ? 'none'  : 'block';
+      }
+      function updateProgress() {
+        if (!video.duration) return;
+        const pct = (video.currentTime / video.duration) * 100;
+        if (fill)  fill.style.width = pct + '%';
+        if (thumb) thumb.style.left = pct + '%';
+        if (timeEl) timeEl.textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
+      }
+
+      if (initOv) {
+        const bigBtn = initOv.querySelector('.vp-big-btn');
+        if (bigBtn) bigBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          video.play().then(function() {
+            initOv.classList.add('hidden');
+            player.classList.add('active');
+            syncIcons();
+          }).catch(console.error);
+        });
+      }
+      video.addEventListener('click', function() {
+        if (video.paused) { video.play().then(() => { syncIcons(); player.classList.add('active'); }); }
+        else { video.pause(); syncIcons(); }
+      });
+      if (ppBtn) ppBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (video.paused) { video.play().then(() => { syncIcons(); player.classList.add('active'); }); }
+        else { video.pause(); syncIcons(); }
+      });
+
+      var fsIconEnter = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+      var fsIconExit  = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+      player.querySelectorAll('[data-action="fullscreen"]').forEach(function(btn) {
+        var btnSvg = btn.querySelector('svg');
+        function updateFsIcon() {
+          var isFs = (document.fullscreenElement === player || document.webkitFullscreenElement === player);
+          if (btnSvg) btnSvg.innerHTML = isFs ? fsIconExit : fsIconEnter;
+        }
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var isFs = (document.fullscreenElement === player || document.webkitFullscreenElement === player);
+          if (isFs) {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          } else {
+            if (player.requestFullscreen) player.requestFullscreen();
+            else if (player.webkitRequestFullscreen) player.webkitRequestFullscreen();
+          }
+        });
+        document.addEventListener('fullscreenchange', updateFsIcon);
+        document.addEventListener('webkitfullscreenchange', updateFsIcon);
+      });
+
+      var muteBtn = player.querySelector('[data-action="mute"]');
+      var volSlider = player.querySelector('[data-action="volume"]');
+      function syncVolIcons() {
+        if (!muteBtn) return;
+        var isMuted = video.muted || video.volume === 0;
+        var iconVol   = muteBtn.querySelector('.icon-vol');
+        var iconMuted = muteBtn.querySelector('.icon-muted');
+        if (iconVol)   iconVol.style.display   = isMuted ? 'none'  : 'block';
+        if (iconMuted) iconMuted.style.display  = isMuted ? 'block' : 'none';
+      }
+      if (muteBtn) muteBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        video.muted = !video.muted;
+        if (volSlider) {
+          volSlider.value = video.muted ? 0 : video.volume;
+          volSlider.style.setProperty('--vol', (video.muted ? 0 : video.volume * 100) + '%');
+        }
+        syncVolIcons();
+      });
+      if (volSlider) volSlider.addEventListener('input', function(e) {
+        e.stopPropagation();
+        video.volume = parseFloat(this.value);
+        video.muted  = video.volume === 0;
+        this.style.setProperty('--vol', (video.volume * 100) + '%');
+        syncVolIcons();
+      });
+
+      player.querySelectorAll('[data-action="rewind"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          video.currentTime = Math.max(0, video.currentTime - 10);
+          showFlash(flashEl, '← 10s'); updateProgress();
+        });
+      });
+      player.querySelectorAll('[data-action="forward"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          video.currentTime = Math.min(video.duration || 0, video.currentTime + 10);
+          showFlash(flashEl, '+10s →'); updateProgress();
+        });
+      });
+
+      if (progBar) {
+        let seeking = false;
+        function seekTo(e) {
+          const rect = progBar.getBoundingClientRect();
+          const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          video.currentTime = pct * (video.duration || 0);
+          updateProgress();
+        }
+        progBar.addEventListener('mousedown', function(e) { e.stopPropagation(); seeking = true; seekTo(e); });
+        window.addEventListener('mousemove', function(e) { if (seeking) seekTo(e); });
+        window.addEventListener('mouseup', function() { seeking = false; });
+      }
+
+      video.addEventListener('timeupdate', updateProgress);
+      video.addEventListener('loadedmetadata', updateProgress);
+      video.addEventListener('ended', function() {
+        if (!video.loop) { initOv && initOv.classList.remove('hidden'); syncIcons(); }
+      });
+    });
+  })();
+
+  /* =====================================================================
+     LIGHTBOX
+     ===================================================================== */
+  (function initLightbox() {
+    const overlay  = document.getElementById('lightbox');
+    const lbImg    = document.getElementById('lightbox-img');
+    const closeBtn = document.getElementById('lightbox-close');
+    if (!overlay || !lbImg) return;
+
+    function open(src, alt) {
+      lbImg.src = src; lbImg.alt = alt || '';
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function close() {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.media-wrap').forEach(function(el) {
+      el.addEventListener('click', function() {
+        const img = el.querySelector('img');
+        const src = el.dataset.img || (img ? img.src : '');
+        if (src) open(src, img ? img.alt : '');
+      });
+    });
+
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay || e.target === lbImg) close();
+    });
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close(); });
+  })();
+  </script>
+</body>
+</html>
