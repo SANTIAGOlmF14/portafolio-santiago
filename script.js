@@ -169,9 +169,9 @@ if (heroSub) {
   if (!photo || !video) return;
 
   const clips = [
-    'Media/Saludo.mp4',
-    'Media/paz.mp4',
-    'Media/bien.mp4'
+    'https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Media/Saludo.mp4',
+    'https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Media/paz.mp4',
+    'https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Media/bien.mp4'
   ];
 
   // Tiempo que la imagen permanece visible (ms)
