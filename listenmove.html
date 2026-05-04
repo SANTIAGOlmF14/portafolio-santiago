@@ -499,6 +499,26 @@
 
     /* Fullscreen button for videos */
     .vp-btn.vp-fs { margin-left: auto; }
+    /* ── Volumen ── */
+    .vp-volume-wrap {
+      display: flex; align-items: center; gap: .4rem; flex-shrink: 0;
+    }
+    .vp-volume-slider {
+      -webkit-appearance: none; appearance: none;
+      width: 60px; height: 3px; border-radius: 2px; cursor: pointer;
+      background: linear-gradient(to right, var(--accent) var(--vol, 100%), rgba(255,255,255,.2) var(--vol, 100%));
+      outline: none; border: none; flex-shrink: 0;
+    }
+    .vp-volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 11px; height: 11px; border-radius: 50%;
+      background: var(--accent); cursor: pointer;
+      box-shadow: 0 0 5px rgba(0,245,196,.5);
+    }
+    .vp-volume-slider::-moz-range-thumb {
+      width: 11px; height: 11px; border-radius: 50%; border: none;
+      background: var(--accent); cursor: pointer;
+    }
 
     /* Fullscreen: video siempre contain para que verticales no se recorten */
     .video-player:-webkit-full-screen,
@@ -614,14 +634,21 @@
       justify-content: space-between;
       position: relative;
       z-index: 1;
-      transition: background .3s;
     }
-    .next-proj:hover { background: var(--bg2); }
+    .next-proj-back, .next-proj-forward {
+      display: flex; align-items: center; gap: 1.5rem;
+      text-decoration: none; padding: 1rem 1.5rem;
+      transition: background .3s;
+      cursor: none;
+    }
+    .next-proj-back:hover, .next-proj-forward:hover { background: var(--bg2); }
     .next-label { font-size: .65rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; margin-bottom: .5rem; }
     .next-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--text); transition: color .3s; }
-    .next-proj:hover .next-title { color: var(--accent); }
+    .next-proj-back:hover .next-title, .next-proj-forward:hover .next-title { color: var(--accent); }
     .next-arrow { font-size: 2rem; color: var(--accent); transition: transform .3s; }
-    .next-proj:hover .next-arrow { transform: translateX(8px); }
+    .next-arrow-left { font-size: 2rem; color: var(--accent); transition: transform .3s; }
+    .next-proj-back:hover .next-arrow-left { transform: translateX(-8px); }
+    .next-proj-forward:hover .next-arrow { transform: translateX(8px); }
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 900px) {
@@ -632,7 +659,8 @@
       .fase-block.reverse { direction: ltr; }
       .specs-row { grid-template-columns: repeat(2, 1fr); }
       .img-pair { grid-template-columns: 1fr; }
-      .next-proj { padding: 3rem 1.5rem; }
+      .next-proj { padding: 1.5rem; flex-direction: column; gap: 1rem; }
+      .next-proj-back, .next-proj-forward { width: 100%; justify-content: space-between; }
     }
     @media (max-width: 480px) {
       .specs-row { grid-template-columns: 1fr; }
@@ -815,6 +843,13 @@
               <div class="vp-progress-thumb"></div>
             </div>
             <span class="vp-time">0:00 / 0:00</span>
+            <div class="vp-volume-wrap">
+              <button class="vp-btn" data-action="mute" title="Silenciar / Activar sonido">
+                <svg class="icon-vol" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                <svg class="icon-muted" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19l2 2L21 19.73l-18-18zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+              </button>
+              <input type="range" class="vp-volume-slider" data-action="volume" min="0" max="1" step="0.05" value="1" title="Volumen" style="--vol:100%">
+            </div>
             <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
               <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
@@ -906,6 +941,13 @@
               <div class="vp-progress-thumb"></div>
             </div>
             <span class="vp-time">0:00 / 0:00</span>
+            <div class="vp-volume-wrap">
+              <button class="vp-btn" data-action="mute" title="Silenciar / Activar sonido">
+                <svg class="icon-vol" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                <svg class="icon-muted" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19l2 2L21 19.73l-18-18zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+              </button>
+              <input type="range" class="vp-volume-slider" data-action="volume" min="0" max="1" step="0.05" value="1" title="Volumen" style="--vol:100%">
+            </div>
             <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
               <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
@@ -1041,6 +1083,13 @@
               <div class="vp-progress-thumb"></div>
             </div>
             <span class="vp-time">0:00</span>
+            <div class="vp-volume-wrap">
+              <button class="vp-btn" data-action="mute" title="Silenciar / Activar sonido">
+                <svg class="icon-vol" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                <svg class="icon-muted" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19l2 2L21 19.73l-18-18zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+              </button>
+              <input type="range" class="vp-volume-slider" data-action="volume" min="0" max="1" step="0.05" value="1" title="Volumen" style="--vol:100%">
+            </div>
             <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
               <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
@@ -1076,6 +1125,13 @@
               <div class="vp-progress-thumb"></div>
             </div>
             <span class="vp-time">0:00</span>
+            <div class="vp-volume-wrap">
+              <button class="vp-btn" data-action="mute" title="Silenciar / Activar sonido">
+                <svg class="icon-vol" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                <svg class="icon-muted" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19l2 2L21 19.73l-18-18zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+              </button>
+              <input type="range" class="vp-volume-slider" data-action="volume" min="0" max="1" step="0.05" value="1" title="Volumen" style="--vol:100%">
+            </div>
             <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
               <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
@@ -1117,13 +1173,22 @@
   </section>
 
   <!-- ── NEXT PROJECT ── -->
-  <a href="index.html#proyectos" class="next-proj">
-    <div>
-      <div class="next-label">← Volver</div>
-      <div class="next-title">Todos los proyectos</div>
-    </div>
-    <div class="next-arrow">→</div>
-  </a>
+  <div class="next-proj">
+    <a href="index.html#proyectos" class="next-proj-back">
+      <div class="next-arrow-left">←</div>
+      <div>
+        <div class="next-label">Volver</div>
+        <div class="next-title">Todos los proyectos</div>
+      </div>
+    </a>
+    <a href="apartamento.html" class="next-proj-forward">
+      <div>
+        <div class="next-label">Siguiente proyecto</div>
+        <div class="next-title">Apartamento VR</div>
+      </div>
+      <div class="next-arrow">→</div>
+    </a>
+  </div>
 
   <footer class="footer">
     <span>Santiago Londoño Mendez © 2026</span>
@@ -1259,6 +1324,34 @@
 
         document.addEventListener('fullscreenchange', updateFsIcon);
         document.addEventListener('webkitfullscreenchange', updateFsIcon);
+      });
+
+      /* ── mute / volumen ── */
+      var muteBtn   = player.querySelector('[data-action="mute"]');
+      var volSlider = player.querySelector('[data-action="volume"]');
+      function syncVolIcons() {
+        if (!muteBtn) return;
+        var isMuted   = video.muted || video.volume === 0;
+        var iconVol   = muteBtn.querySelector('.icon-vol');
+        var iconMuted = muteBtn.querySelector('.icon-muted');
+        if (iconVol)   iconVol.style.display   = isMuted ? 'none'  : 'block';
+        if (iconMuted) iconMuted.style.display  = isMuted ? 'block' : 'none';
+      }
+      if (muteBtn) muteBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        video.muted = !video.muted;
+        if (volSlider) {
+          volSlider.value = video.muted ? 0 : video.volume;
+          volSlider.style.setProperty('--vol', (video.muted ? 0 : video.volume * 100) + '%');
+        }
+        syncVolIcons();
+      });
+      if (volSlider) volSlider.addEventListener('input', function(e) {
+        e.stopPropagation();
+        video.volume = parseFloat(this.value);
+        video.muted  = video.volume === 0;
+        this.style.setProperty('--vol', (video.volume * 100) + '%');
+        syncVolIcons();
       });
 
       /* ── rewind / forward buttons ── */

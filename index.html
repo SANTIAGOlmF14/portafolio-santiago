@@ -118,7 +118,9 @@
 
       <!-- VIDEO DE PRESENTACIÓN -->
       <div class="sobre-imagen reveal">
-        <div class="presentacion-wrap">
+        <div class="presentacion-wrap" id="pres-wrap">
+
+          <!-- VIDEO — siempre presente en el DOM -->
           <video
             id="presentacion-video"
             src="https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Media/presentacion.mp4"
@@ -126,40 +128,54 @@
             playsinline
           ></video>
 
-          <div class="play-overlay" id="play-overlay">
-            <button class="play-btn" id="play-btn" aria-label="Reproducir presentación">
-              <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="40" cy="40" r="38" stroke="currentColor" stroke-width="2"/>
-                <polygon points="32,24 60,40 32,56" fill="currentColor"/>
-              </svg>
-            </button>
-            <p class="play-label">Ver presentación</p>
+          <!-- POSTER SLIDESHOW — encima del video hasta que se da play -->
+          <div id="pres-poster" style="position:absolute;inset:0;z-index:10;pointer-events:auto;">
+            <!-- imágenes rotativas -->
+            <img id="pslide-1" src="Media/valor.png"  alt="valor"  style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;transition:opacity 1.4s ease;"/>
+            <img id="pslide-2" src="Media/vision.png" alt="vision" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.4s ease;"/>
+            <img id="pslide-3" src="Media/red.png"    alt="red"    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.4s ease;"/>
+            <!-- oscurecimiento suave -->
+            <div style="position:absolute;inset:0;background:rgba(8,11,16,.38);z-index:1;"></div>
+            <!-- botón play + texto -->
+            <div style="position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;">
+              <button id="pres-play-btn" aria-label="Reproducir presentación" style="width:72px;height:72px;border-radius:50%;border:2px solid var(--accent);background:none;color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s,transform .2s;">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><polygon points="6,3 20,12 6,21"/></svg>
+              </button>
+              <p style="font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin:0;">Ver presentación</p>
+            </div>
+            <!-- dots indicadores -->
+            <div style="position:absolute;bottom:.9rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;z-index:3;">
+              <span id="pdot-0" style="width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:1;transition:opacity .3s;display:block;"></span>
+              <span id="pdot-1" style="width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:.3;transition:opacity .3s;display:block;"></span>
+              <span id="pdot-2" style="width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:.3;transition:opacity .3s;display:block;"></span>
+            </div>
           </div>
 
-          <div class="video-controls" id="video-controls">
-            <button class="ctrl-btn" id="pause-btn" title="Pausar/Reanudar">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                <rect x="5" y="3" width="4" height="18" rx="1"/>
-                <rect x="15" y="3" width="4" height="18" rx="1"/>
-              </svg>
+          <!-- CONTROLES — ocultos hasta que empieza el video, z-index ALTO -->
+          <div id="pres-controls" style="display:none;position:absolute;bottom:0;left:0;right:0;padding:.5rem .8rem .6rem;background:linear-gradient(transparent,rgba(0,0,0,.85));z-index:20;align-items:center;gap:.6rem;">
+            <!-- pause/play -->
+            <button id="pres-pp" title="Pausar/Reanudar" style="background:none;border:none;cursor:pointer;color:var(--accent);padding:2px;display:flex;align-items:center;justify-content:center;transition:color .15s,transform .15s;">
+              <svg id="pres-icon-pause" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+              <svg id="pres-icon-play"  viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none;"><polygon points="5,3 19,12 5,21"/></svg>
             </button>
-            <div class="progress-wrap">
-              <div class="progress-track" id="progress-track">
-                <div class="progress-fill" id="progress-fill"></div>
-              </div>
+            <!-- barra de progreso -->
+            <div id="pres-track" style="flex:1;position:relative;height:4px;background:rgba(255,255,255,.2);border-radius:2px;cursor:pointer;">
+              <div id="pres-fill" style="position:absolute;top:0;left:0;height:100%;width:0%;background:var(--accent);border-radius:2px;pointer-events:none;transition:width .1s linear;"></div>
+              <div id="pres-thumb" style="position:absolute;top:50%;transform:translateY(-50%);width:12px;height:12px;background:var(--accent);border-radius:50%;margin-left:-6px;pointer-events:none;box-shadow:0 0 6px rgba(0,245,196,.6);transition:left .1s linear;"></div>
             </div>
-            <button class="ctrl-btn" id="mute-btn" title="Silenciar/Activar sonido">
-              <svg id="icon-sound" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
-              </svg>
-              <svg id="icon-muted" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none">
-                <path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19l2 2L21 19.73l-18-18zM12 4L9.91 6.09 12 8.18V4z"/>
-              </svg>
+            <!-- tiempo -->
+            <span id="pres-time" style="font-size:.6rem;letter-spacing:1px;color:var(--text-muted);white-space:nowrap;min-width:72px;text-align:right;flex-shrink:0;">0:00</span>
+            <!-- mute -->
+            <button id="pres-mute" title="Silenciar/Activar" style="background:none;border:none;cursor:pointer;color:var(--accent);padding:2px;display:flex;align-items:center;justify-content:center;transition:color .15s,transform .15s;">
+              <svg id="pres-vol"   viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+              <svg id="pres-muted" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none;"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19l2 2L21 19.73l-18-18zM12 4L9.91 6.09 12 8.18V4z"/></svg>
             </button>
-            <button class="ctrl-btn" id="fullscreen-btn" title="Pantalla completa">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
-              </svg>
+            <!-- volumen slider -->
+            <input id="pres-vol-slider" type="range" min="0" max="1" step="0.05" value="1" title="Volumen"
+              style="-webkit-appearance:none;appearance:none;width:60px;height:3px;border-radius:2px;cursor:pointer;background:linear-gradient(to right,var(--accent) 100%,rgba(255,255,255,.2) 100%);outline:none;border:none;flex-shrink:0;--vol:100%;">
+            <!-- fullscreen -->
+            <button id="pres-fs" title="Pantalla completa" style="background:none;border:none;cursor:pointer;color:var(--accent);padding:2px;display:flex;align-items:center;justify-content:center;margin-left:auto;transition:color .15s,transform .15s;">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
           </div>
 
@@ -220,14 +236,19 @@
     <h2 class="section-title reveal">Lo que he construido</h2>
     <div class="proyectos-grid">
       <div class="proyecto-card reveal" data-delay="0">
-        <div class="proyecto-img">
-          <div class="proyecto-placeholder">📁 assets/proyecto1.jpg</div>
-          <div class="proyecto-overlay"><a href="#" class="proyecto-link">Ver más →</a></div>
+        <div class="proyecto-img" style="position:relative; overflow:hidden; background:#060d10;">
+          <img id="ap-slide-1" src="Apartamento/Unity1.png" alt="Apartamento VR — Vista general"
+            style="width:100%;height:100%;object-fit:cover;object-position:center center;position:absolute;inset:0;opacity:1;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="ap-slide-2" src="Apartamento/Unity2.png" alt="Apartamento VR — Sala y cocina"
+            style="width:100%;height:100%;object-fit:cover;object-position:center center;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="ap-slide-3" src="Apartamento/Unity3.png" alt="Apartamento VR — Cocina y comedor"
+            style="width:100%;height:100%;object-fit:cover;object-position:center center;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <div class="proyecto-overlay"><a href="apartamento.html" class="proyecto-link">Ver más →</a></div>
         </div>
         <div class="proyecto-info">
-          <span class="proyecto-tag">Unity · VR</span>
-          <h3>Nombre del Proyecto 1</h3>
-          <p>Descripción breve de tu proyecto.</p>
+          <span class="proyecto-tag">Unity · VR · Oculus · Realidad Virtual</span>
+          <h3>Apartamento VR — Simulación Inmersiva</h3>
+          <p>Aplicativo de realidad virtual en Unity para Oculus. Navegación libre, personalización de texturas, control de iluminación e interacción total con el entorno.</p>
         </div>
       </div>
       <div class="proyecto-card reveal" data-delay="1">
@@ -296,7 +317,7 @@
         <a href="https://www.linkedin.com/in/santiagolondo%C3%B1o/" target="_blank" class="contacto-item">
           <span class="ci-icon">in</span><span>LinkedIn</span>
         </a>
-        <a href="https://github.com/" target="_blank" class="contacto-item">
+        <a href="https://github.com/SANTIAGOlmF14" target="_blank" class="contacto-item">
           <span class="ci-icon">⌥</span><span>GitHub</span>
         </a>
       </div>
@@ -310,6 +331,172 @@
 
   <script src="script.js"></script>
   <script>
+  /* =====================================================================
+     PRESENTACION VIDEO PLAYER — completamente autónomo
+     ===================================================================== */
+  (function() {
+    const video    = document.getElementById('presentacion-video');
+    const poster   = document.getElementById('pres-poster');
+    const controls = document.getElementById('pres-controls');
+    const playBtn  = document.getElementById('pres-play-btn');
+    const ppBtn    = document.getElementById('pres-pp');
+    const iconPause= document.getElementById('pres-icon-pause');
+    const iconPlay = document.getElementById('pres-icon-play');
+    const track    = document.getElementById('pres-track');
+    const fill     = document.getElementById('pres-fill');
+    const thumb    = document.getElementById('pres-thumb');
+    const timeEl   = document.getElementById('pres-time');
+    const muteBtn  = document.getElementById('pres-mute');
+    const volEl    = document.getElementById('pres-vol');
+    const mutedEl  = document.getElementById('pres-muted');
+    const volSlider= document.getElementById('pres-vol-slider');
+    const fsBtn    = document.getElementById('pres-fs');
+    const wrap     = document.getElementById('pres-wrap');
+    if (!video) return;
+
+    function fmt(s) {
+      if (isNaN(s) || !s) return '0:00';
+      return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
+    }
+    function syncPP() {
+      iconPause.style.display = video.paused ? 'none'  : 'block';
+      iconPlay.style.display  = video.paused ? 'block' : 'none';
+    }
+    function updateProg() {
+      if (!video.duration) return;
+      const pct = (video.currentTime / video.duration) * 100;
+      fill.style.width  = pct + '%';
+      thumb.style.left  = pct + '%';
+      timeEl.textContent = fmt(video.currentTime) + ' / ' + fmt(video.duration);
+    }
+    function syncVol() {
+      const m = video.muted || video.volume === 0;
+      volEl.style.display   = m ? 'none'  : 'block';
+      mutedEl.style.display = m ? 'block' : 'none';
+      const pct = (m ? 0 : video.volume * 100);
+      volSlider.style.background = `linear-gradient(to right,var(--accent) ${pct}%,rgba(255,255,255,.2) ${pct}%)`;
+    }
+
+    /* ── Play inicial desde poster ── */
+    playBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      video.play().then(function() {
+        poster.style.transition = 'opacity .5s';
+        poster.style.opacity = '0';
+        poster.style.pointerEvents = 'none';
+        controls.style.display = 'flex';
+        syncPP();
+      }).catch(console.error);
+    });
+
+    /* ── Pause/Play button ── */
+    ppBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      video.paused ? video.play().then(syncPP) : (video.pause(), syncPP());
+    });
+
+    /* ── Click en video ── */
+    video.addEventListener('click', function() {
+      video.paused ? video.play().then(syncPP) : (video.pause(), syncPP());
+    });
+
+    /* ── Seek bar ── */
+    let seeking = false;
+    function seekTo(clientX) {
+      const r = track.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+      video.currentTime = pct * (video.duration || 0);
+      updateProg();
+    }
+    track.addEventListener('mousedown', function(e) { e.stopPropagation(); seeking = true; seekTo(e.clientX); });
+    window.addEventListener('mousemove', function(e) { if (seeking) seekTo(e.clientX); });
+    window.addEventListener('mouseup', function() { seeking = false; });
+
+    /* ── Mute ── */
+    muteBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      video.muted = !video.muted;
+      volSlider.value = video.muted ? 0 : video.volume;
+      syncVol();
+    });
+
+    /* ── Volume slider ── */
+    volSlider.addEventListener('input', function(e) {
+      e.stopPropagation();
+      video.volume = parseFloat(this.value);
+      video.muted  = video.volume === 0;
+      syncVol();
+    });
+
+    /* ── Fullscreen ── */
+    fsBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const isFs = document.fullscreenElement === wrap || document.webkitFullscreenElement === wrap;
+      if (isFs) {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      } else {
+        (wrap.requestFullscreen || wrap.webkitRequestFullscreen).call(wrap);
+      }
+    });
+
+    /* ── Progress update ── */
+    video.addEventListener('timeupdate', updateProg);
+    video.addEventListener('loadedmetadata', updateProg);
+
+    /* ── Al terminar: volver al poster + reanudar slideshow ── */
+    video.addEventListener('ended', function() {
+      controls.style.display = 'none';
+      poster.style.opacity = '1';
+      poster.style.pointerEvents = 'auto';
+      resetSlideshow();
+    });
+  })();
+
+  /* =====================================================================
+     POSTER SLIDESHOW
+     ===================================================================== */
+  var _slideshowInterval = null;
+  function resetSlideshow() {
+    const slides = [
+      document.getElementById('pslide-1'),
+      document.getElementById('pslide-2'),
+      document.getElementById('pslide-3'),
+    ];
+    const dots = [
+      document.getElementById('pdot-0'),
+      document.getElementById('pdot-1'),
+      document.getElementById('pdot-2'),
+    ];
+    if (!slides[0]) return;
+    clearInterval(_slideshowInterval);
+    let cur = 0;
+    slides.forEach(function(s,i){ s.style.opacity = i===0?'1':'0'; });
+    dots.forEach(function(d,i){ if(d) d.style.opacity = i===0?'1':'.3'; });
+    _slideshowInterval = setInterval(function() {
+      slides[cur].style.opacity = '0';
+      if (dots[cur]) dots[cur].style.opacity = '.3';
+      cur = (cur + 1) % slides.length;
+      slides[cur].style.opacity = '1';
+      if (dots[cur]) dots[cur].style.opacity = '1';
+    }, 4000);
+  }
+  resetSlideshow();
+    /* ── Apartamento card slideshow (3 imágenes) ── */
+    (function apSlide() {
+      const slides = [
+        document.getElementById('ap-slide-1'),
+        document.getElementById('ap-slide-2'),
+        document.getElementById('ap-slide-3'),
+      ];
+      if (!slides[0]) return;
+      let cur = 0;
+      setInterval(() => {
+        slides[cur].style.opacity = '0';
+        cur = (cur + 1) % slides.length;
+        slides[cur].style.opacity = '1';
+      }, 3000);
+    })();
+
     /* ── Alyra card slideshow (3 imágenes) ── */
     (function alSlide() {
       const slides = [
