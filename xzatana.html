@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Xzatana — Videojuego 3D | SLM</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    /* ===== PROYECTO DETAIL PAGE ===== */
+    .proj-hero {
+      min-height: 100vh; display: flex; align-items: flex-end;
+      padding: 0 4rem 5rem; position: relative; overflow: hidden; z-index: 1;
+    }
+    .proj-hero-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 30%, rgba(0,245,196,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(123,97,255,0.06) 0%, transparent 50%);
+      z-index: 0;
+    }
+    .proj-hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,245,196,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,196,.03) 1px, transparent 1px);
+      background-size: 60px 60px; pointer-events: none;
+    }
+    .proj-hero-visual { position: absolute; inset: 0; z-index: 0; }
+    .proj-hero-visual img {
+      width: 100%; height: 100%; object-fit: cover; object-position: center 30%;
+      opacity: 0.12; filter: grayscale(40%) contrast(1.2);
+    }
+    .proj-hero-content { position: relative; z-index: 2; max-width: 800px; }
+    .back-link {
+      display: inline-flex; align-items: center; gap: .6rem;
+      font-size: .7rem; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 3rem; transition: color .2s; cursor: none;
+    }
+    .back-link:hover { color: var(--accent); }
+    .back-link .arrow { font-size: 1rem; transition: transform .2s; }
+    .back-link:hover .arrow { transform: translateX(-4px); }
+    .proj-category {
+      font-size: .7rem; letter-spacing: 4px; color: var(--accent);
+      text-transform: uppercase; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .proj-category::before { content: ''; display: block; width: 30px; height: 1px; background: var(--accent); }
+    .proj-title {
+      font-family: var(--font-display); font-size: clamp(3rem, 7vw, 6.5rem);
+      font-weight: 900; line-height: .9; letter-spacing: -3px; margin-bottom: 1.5rem;
+    }
+    .proj-title span { display: block; color: transparent; -webkit-text-stroke: 2px var(--accent); }
+    .proj-subtitle { font-size: .9rem; color: var(--text-muted); max-width: 550px; line-height: 1.8; margin-bottom: 2.5rem; }
+    .proj-meta { display: flex; gap: 2.5rem; flex-wrap: wrap; }
+    .proj-meta-item { display: flex; flex-direction: column; gap: .25rem; }
+    .proj-meta-label { font-size: .6rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; }
+    .proj-meta-val { font-size: .82rem; color: var(--accent); font-family: var(--font-display); font-weight: 700; }
+    .proj-scroll-hint {
+      position: absolute; right: 4rem; bottom: 3rem;
+      display: flex; flex-direction: column; align-items: center;
+      gap: .8rem; font-size: .6rem; letter-spacing: 3px;
+      color: var(--text-muted); text-transform: uppercase; z-index: 2;
+    }
+    .proj-scroll-line {
+      width: 1px; height: 60px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity:.4; transform: scaleY(1); }
+      50% { opacity:1; transform: scaleY(1.2); }
+    }
+
+    /* ===== SECTIONS ===== */
+    .proj-section { position: relative; z-index: 1; padding: 6rem 4rem; }
+    .proj-section--dark {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .section-eyebrow {
+      font-size: .65rem; letter-spacing: 4px;
+      color: var(--accent); text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .prose-title {
+      font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 700; margin-bottom: 2rem; letter-spacing: -1px; line-height: 1.1;
+    }
+    .prose-title .hl { color: var(--accent); }
+    .prose { max-width: 680px; color: var(--text-muted); font-size: .88rem; line-height: 1.9; }
+    .prose p { margin-bottom: 1.2rem; }
+    .prose strong { color: var(--text); }
+
+    /* ===== VIDEO AUTO (gif-like) ===== */
+    .vid-auto {
+      position: relative; background: #000; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .vid-auto video { width: 100%; display: block; object-fit: cover; }
+    .vid-auto-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: .4rem .7rem;
+      background: linear-gradient(transparent, rgba(0,0,0,.85));
+      font-size: .58rem; letter-spacing: 2px;
+      color: var(--accent); text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    /* ===== VIDEO PLAYER (con controles) ===== */
+    .video-player {
+      position: relative; background: #000;
+      border: 1px solid var(--border); overflow: hidden; cursor: pointer;
+    }
+    .video-player video { width: 100%; display: block; object-fit: cover; }
+    .vp-init-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(8,11,16,.55); backdrop-filter: blur(3px);
+      transition: opacity .3s; z-index: 4;
+      cursor: pointer;
+    }
+    .vp-init-overlay.hidden { opacity: 0; pointer-events: none; }
+    .vp-big-btn {
+      width: 68px; height: 68px; background: none;
+      border: 2px solid var(--accent); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent); transition: all .2s; cursor: pointer;
+    }
+    .vp-big-btn:hover { background: var(--accent); color: var(--bg); transform: scale(1.1); }
+    .vp-controls {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: .5rem .8rem .6rem;
+      background: linear-gradient(transparent, rgba(0,0,0,.85));
+      display: flex; align-items: center; gap: .6rem;
+      z-index: 5; opacity: 0; transition: opacity .25s;
+    }
+    .video-player:hover .vp-controls,
+    .video-player.active .vp-controls { opacity: 1; }
+    .vp-btn {
+      background: none; border: none; cursor: pointer; color: var(--accent);
+      padding: 2px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: color .15s, transform .15s;
+    }
+    .vp-btn:hover { color: #fff; transform: scale(1.15); }
+    .vp-btn svg { pointer-events: none; }
+    .vp-progress {
+      flex: 1; position: relative; height: 4px;
+      background: rgba(255,255,255,.2); border-radius: 2px; cursor: pointer;
+    }
+    .vp-progress-fill {
+      position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+      background: var(--accent); border-radius: 2px; pointer-events: none;
+      transition: width .1s linear;
+    }
+    .vp-progress-thumb {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 12px; height: 12px; background: var(--accent);
+      border-radius: 50%; margin-left: -6px; pointer-events: none;
+      transition: left .1s linear; box-shadow: 0 0 6px rgba(0,245,196,.6);
+    }
+    .vp-time {
+      font-size: .6rem; letter-spacing: 1px; color: var(--text-muted);
+      white-space: nowrap; flex-shrink: 0; min-width: 72px; text-align: right;
+    }
+    .vp-seek-flash {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      font-family: var(--font-display); font-size: .75rem;
+      letter-spacing: 2px; color: var(--accent);
+      background: rgba(8,11,16,.7); padding: .4rem .9rem;
+      border: 1px solid var(--border); pointer-events: none;
+      opacity: 0; transition: opacity .2s; z-index: 6; white-space: nowrap;
+    }
+    .vp-seek-flash.show { opacity: 1; }
+    .vp-btn.vp-fs { margin-left: auto; }
+    .vp-volume-wrap { display: flex; align-items: center; gap: .4rem; flex-shrink: 0; }
+    .vp-volume-slider {
+      -webkit-appearance: none; appearance: none;
+      width: 60px; height: 3px; border-radius: 2px; cursor: pointer;
+      background: linear-gradient(to right, var(--accent) var(--vol, 100%), rgba(255,255,255,.2) var(--vol, 100%));
+      outline: none; border: none; flex-shrink: 0;
+    }
+    .vp-volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 11px; height: 11px;
+      border-radius: 50%; background: var(--accent); cursor: pointer;
+      box-shadow: 0 0 5px rgba(0,245,196,.5);
+    }
+    .vp-volume-slider::-moz-range-thumb {
+      width: 11px; height: 11px; border-radius: 50%; border: none;
+      background: var(--accent); cursor: pointer;
+    }
+    .video-player:-webkit-full-screen,
+    .video-player:fullscreen {
+      background: #000; width: 100vw !important; height: 100vh !important;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .video-player:-webkit-full-screen video,
+    .video-player:fullscreen video {
+      width: 100vw !important; height: 100vh !important;
+      object-fit: contain !important; max-height: 100vh;
+    }
+    .video-player:-webkit-full-screen .vp-controls,
+    .video-player:fullscreen .vp-controls { position: fixed; bottom: 0; left: 0; right: 0; z-index: 99999; opacity: 1; }
+
+    /* ===== MEDIA CONTAINER ===== */
+    .media-container { position: relative; }
+    .media-label {
+      position: relative; display: inline-block; margin-top: 1rem; left: 0;
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: .6rem;
+      letter-spacing: 2px; padding: .3rem .8rem;
+      text-transform: uppercase; z-index: 10;
+    }
+    .media-glow {
+      position: absolute; inset: -1px; border: 1px solid var(--accent);
+      opacity: .2; pointer-events: none; transform: translate(8px,8px); transition: transform .4s;
+    }
+    .media-container:hover .media-glow { transform: translate(4px,4px); }
+
+    /* ===== GRID 2 COLS (items / entornos) ===== */
+    .duo-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1.5rem; margin-top: 2rem;
+    }
+    .duo-grid--3 { grid-template-columns: 1fr 1fr 1fr; }
+    .duo-grid--4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+    /* ===== ENEMY CARDS ===== */
+    .enemy-card {
+      border: 1px solid var(--border); background: var(--bg2);
+      overflow: hidden; transition: border-color .3s;
+    }
+    .enemy-card:hover { border-color: rgba(0,245,196,.4); }
+    .enemy-card video { width: 100%; display: block; object-fit: cover; aspect-ratio: 16/10; }
+    .enemy-info { padding: 1rem 1.2rem; }
+    .enemy-name {
+      font-family: var(--font-display); font-size: .78rem; font-weight: 700;
+      color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: .3rem;
+    }
+    .enemy-desc { font-size: .76rem; color: var(--text-muted); line-height: 1.7; }
+
+    /* ===== ITEM CARD ===== */
+    .item-card {
+      border: 1px solid var(--border); background: var(--bg2);
+      overflow: hidden; transition: border-color .3s;
+    }
+    .item-card:hover { border-color: rgba(0,245,196,.4); }
+    .item-card video { width: 100%; display: block; object-fit: cover; aspect-ratio: 16/9; }
+    .item-info { padding: 1rem 1.2rem; }
+    .item-label {
+      font-family: var(--font-display); font-size: .65rem; font-weight: 700;
+      color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: .25rem;
+    }
+    .item-desc { font-size: .76rem; color: var(--text-muted); line-height: 1.7; }
+
+    /* ===== NEXT PROJ ===== */
+    .next-proj {
+      border-top: 1px solid var(--border); padding: 4rem;
+      display: flex; align-items: center; justify-content: space-between;
+      position: relative; z-index: 1;
+    }
+    .next-proj-back, .next-proj-forward {
+      display: flex; align-items: center; gap: 1.5rem;
+      text-decoration: none; padding: 1rem 1.5rem; transition: background .3s; cursor: none;
+    }
+    .next-proj-back:hover, .next-proj-forward:hover { background: var(--bg2); }
+    .next-label { font-size: .65rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; margin-bottom: .5rem; }
+    .next-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--text); transition: color .3s; }
+    .next-proj-back:hover .next-title, .next-proj-forward:hover .next-title { color: var(--accent); }
+    .next-arrow { font-size: 2rem; color: var(--accent); transition: transform .3s; }
+    .next-arrow-left { font-size: 2rem; color: var(--accent); transition: transform .3s; }
+    .next-proj-back:hover .next-arrow-left { transform: translateX(-8px); }
+    .next-proj-forward:hover .next-arrow { transform: translateX(8px); }
+
+    /* ===== LIGHTBOX ===== */
+    .lightbox-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.93); z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .3s; cursor: zoom-out;
+    }
+    .lightbox-overlay.active { opacity: 1; pointer-events: all; }
+    .lightbox-overlay img {
+      max-width: 92vw; max-height: 90vh; object-fit: contain;
+      border: 1px solid rgba(0,245,196,.3); box-shadow: 0 0 60px rgba(0,245,196,.15);
+    }
+    .lightbox-close {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      background: none; border: 1px solid rgba(0,245,196,.4);
+      color: var(--accent); font-size: 1.2rem;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .2s;
+    }
+    .lightbox-close:hover { background: var(--accent); color: var(--bg); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .proj-hero { padding: 0 1.5rem 4rem; }
+      .proj-scroll-hint { display: none; }
+      .proj-section { padding: 4rem 1.5rem; }
+      .duo-grid { grid-template-columns: 1fr; }
+      .duo-grid--3 { grid-template-columns: 1fr 1fr; }
+      .duo-grid--4 { grid-template-columns: 1fr 1fr; }
+      .next-proj { padding: 1.5rem; flex-direction: column; gap: 1rem; }
+      .next-proj-back, .next-proj-forward { width: 100%; justify-content: space-between; }
+    }
+    @media (max-width: 600px) {
+      .duo-grid--3, .duo-grid--4 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor"></div>
+  <div class="cursor-trail"></div>
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">SLM<span class="dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html#sobre-mi">Sobre mí</a></li>
+      <li><a href="index.html#habilidades">Skills</a></li>
+      <li><a href="index.html#proyectos">Proyectos</a></li>
+      <li><a href="index.html#contacto">Contacto</a></li>
+    </ul>
+    <div class="nav-status">
+      <span class="status-dot"></span> Open to work
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="proj-hero">
+    <div class="proj-hero-bg"></div>
+    <div class="proj-hero-grid"></div>
+    <div class="proj-hero-visual">
+      <img src="Xzatana/Enemigos.png" alt="Xzatana" />
+    </div>
+
+    <div class="proj-hero-content">
+      <a href="index.html#proyectos" class="back-link">
+        <span class="arrow">←</span> Volver a proyectos
+      </a>
+      <div class="proj-category">Unity · PC · Hack &amp; Slash · 3D</div>
+      <h1 class="proj-title">
+        XZATANA
+        <span>VIDEOJUEGO 3D</span>
+      </h1>
+      <p class="proj-subtitle">
+        Videojuego de acción en tercera persona desarrollado en Unity para PC.
+        Un guerrero exiliado. Un reino consumido por la oscuridad.
+        La legendaria espada Xzatana como única esperanza.
+      </p>
+      <div class="proj-meta">
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Motor</span>
+          <span class="proj-meta-val">Unity</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Plataforma</span>
+          <span class="proj-meta-val">PC</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Género</span>
+          <span class="proj-meta-val">Hack &amp; Slash</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Equipo</span>
+          <span class="proj-meta-val">4 personas</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-scroll-hint">
+      <span>scroll</span>
+      <div class="proj-scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ── INTRO + EQUIPO ── -->
+  <section class="proj-section reveal">
+    <div class="section-eyebrow">00 // El proyecto</div>
+    <h2 class="prose-title">Un reino consumido.<br><span class="hl">Una espada que decide el mundo.</span></h2>
+    <div class="prose">
+      <p>
+        Xzatana es un videojuego de acción en tercera persona con estética de fantasía medieval oscura.
+        La trama gira en torno a un reino que ha sido consumido por las fuerzas de la oscuridad
+        tras el despertar de un antiguo mal. El jugador toma el rol de un <strong>guerrero exiliado</strong>
+        cuyo destino está ligado a la legendaria espada "Xzatana" — un arma con el poder de
+        cambiar el curso del mundo.
+      </p>
+      <p>
+        A lo largo del juego encontrás personajes clave: aliados hechiceros, figuras misteriosas
+        y enemigos que buscan controlar el poder de la espada para sus propios fines oscuros.
+        El diseño visual se inspiró en títulos como Final Fantasy XVI y God of War, buscando
+        capturar una atmósfera <strong>cargada de tensión, misterio y amenaza constante</strong>.
+      </p>
+      <p>
+        El juego incluye sistema de combate en tiempo real con combos, ítems coleccionables,
+        un NPC de soporte con diálogos, cuatro entornos distintos y un jefe final.
+        Cada mecánica fue construida desde cero en Unity durante el desarrollo académico.
+      </p>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:3rem;">
+      <div class="section-eyebrow" style="width:100%;margin-bottom:.5rem;">// Equipo</div>
+      <div style="background:var(--surface);border:1px solid rgba(0,245,196,.5);padding:.6rem 1.2rem;font-size:.72rem;letter-spacing:1px;color:var(--accent);">
+        <span style="margin-right:.5rem;opacity:.5;">//</span>Santiago Londoño Mendez
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);padding:.6rem 1.2rem;font-size:.72rem;letter-spacing:1px;color:var(--text-muted);">
+        <span style="margin-right:.5rem;color:var(--accent);opacity:.5;">//</span>Eddy Santiago Samudio Cuellar
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);padding:.6rem 1.2rem;font-size:.72rem;letter-spacing:1px;color:var(--text-muted);">
+        <span style="margin-right:.5rem;color:var(--accent);opacity:.5;">//</span>Niko Alejandro Bonilla Martínez
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);padding:.6rem 1.2rem;font-size:.72rem;letter-spacing:1px;color:var(--text-muted);">
+        <span style="margin-right:.5rem;color:var(--accent);opacity:.5;">//</span>Dayan David Lara Calzada
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ENEMIGOS ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">01 // Enemigos</div>
+    <h2 class="prose-title reveal">Tres amenazas.<br><span class="hl">Un solo destino.</span></h2>
+    <div class="prose reveal" style="margin-bottom:2rem;">
+      <p>
+        El juego cuenta con tres tipos de enemigos, cada uno con comportamiento, tamaño
+        y nivel de peligro distintos. El video muestra a los tres en acción simultánea;
+        abajo, las fichas de cada uno con su lógica de combate.
+      </p>
+    </div>
+
+    <!-- Video único compartido -->
+    <div class="reveal" style="max-width:1100px;margin:0 auto 2.5rem auto;">
+      <div class="vid-auto media-container" style="border:1px solid var(--border);">
+        <video src="Xzatana/enemigos.mp4" autoplay muted loop playsinline
+          style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;"></video>
+        <div class="vid-auto-label">// Los tres enemigos en acción</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+
+    <!-- Fichas de enemigos (solo texto + icono) -->
+    <div class="duo-grid duo-grid--3 reveal" style="max-width:1100px;margin-left:auto;margin-right:auto;">
+
+      <!-- Diablillo -->
+      <div class="enemy-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div style="padding:1.4rem 1.4rem .8rem;display:flex;align-items:center;gap:.9rem;">
+          <div style="width:44px;height:44px;border:1px solid rgba(0,245,196,.4);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">👹</div>
+          <div>
+            <div class="enemy-name">Diablillo</div>
+            <div style="font-size:.6rem;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;">Rápido · Kamikaze</div>
+          </div>
+        </div>
+        <div class="enemy-info" style="padding-top:.4rem;">
+          <div class="enemy-desc">Pequeño pero letal. Con poca vida y velocidad fuera de lo común, su táctica es el kamikaze: se lanza directo contra el jugador y <strong style="color:var(--text);">explota al contacto</strong> para infligir daño masivo.</div>
+        </div>
+      </div>
+
+      <!-- Súdito de Sorad -->
+      <div class="enemy-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div style="padding:1.4rem 1.4rem .8rem;display:flex;align-items:center;gap:.9rem;">
+          <div style="width:44px;height:44px;border:1px solid rgba(0,245,196,.4);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">⚔️</div>
+          <div>
+            <div class="enemy-name">Súdito de Sorad</div>
+            <div style="font-size:.6rem;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;">Enemigo base · Combos</div>
+          </div>
+        </div>
+        <div class="enemy-info" style="padding-top:.4rem;">
+          <div class="enemy-desc">El adversario más frecuente. Proporciones similares al protagonista, ataca con <strong style="color:var(--text);">combos de espada</strong> que exigen timing para bloquear. Aparece en la mayoría de los niveles.</div>
+        </div>
+      </div>
+
+      <!-- Sorad -->
+      <div class="enemy-card" style="border-color:rgba(255,107,107,.3);display:flex;flex-direction:column;justify-content:space-between;">
+        <div style="padding:1.4rem 1.4rem .8rem;display:flex;align-items:center;gap:.9rem;">
+          <div style="width:44px;height:44px;border:1px solid rgba(255,107,107,.5);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">🐉</div>
+          <div>
+            <div class="enemy-name" style="color:#ff6b6b;">Sorad — Jefe Final</div>
+            <div style="font-size:.6rem;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;">Gigante · Fuego · Castillo</div>
+          </div>
+        </div>
+        <div class="enemy-info" style="padding-top:.4rem;">
+          <div class="enemy-desc">Gigante e imponente. Domina el combate cuerpo a cuerpo con combos devastadores y es capaz de <strong style="color:#ff6b6b;">escupir fuego como un dragón</strong>. La batalla final ocurre en el castillo.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── PERSONAJES ── -->
+  <section class="proj-section">
+    <div class="section-eyebrow">02 // Personajes</div>
+    <h2 class="prose-title reveal">El guerrero<br><span class="hl">y su aliada.</span></h2>
+    <div class="prose reveal" style="margin-bottom:2.5rem;">
+      <p>
+        El jugador controla al protagonista: un guerrero armado con la espada Xzatana.
+        A su lado, un NPC de soporte que detecta enemigos y alerta al jugador mediante
+        diálogos flotantes sobre su cabeza.
+      </p>
+    </div>
+
+    <div class="duo-grid reveal" style="max-width:1100px;margin-left:auto;margin-right:auto;">
+      <div class="vid-auto media-container" style="border:1px solid var(--border);">
+        <video src="Xzatana/npc2.mp4" autoplay muted loop playsinline style="width:100%;display:block;object-fit:cover;aspect-ratio:16/9;"></video>
+        <div class="vid-auto-label">// NPC — Vista general</div>
+        <div class="media-glow"></div>
+      </div>
+      <div class="vid-auto media-container" style="border:1px solid var(--border);">
+        <video src="Xzatana/npc.mp4" autoplay muted loop playsinline style="width:100%;display:block;object-fit:cover;aspect-ratio:16/9;"></video>
+        <div class="vid-auto-label">// NPC — Sistema de diálogos</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ÍTEMS ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">03 // Ítems</div>
+    <h2 class="prose-title reveal">Recogé.<br><span class="hl">Sobrevivé.</span></h2>
+    <div class="prose reveal" style="margin-bottom:3rem;">
+      <p>
+        El juego cuenta con dos tipos de ítems que el jugador puede recoger durante el recorrido.
+        Cada uno tiene su visualización en el mundo y un efecto concreto al interactuar con él.
+        Podés ver primero cómo luce el objeto y luego cómo reacciona el personaje al tomarlo.
+      </p>
+    </div>
+
+    <!-- ─ Ítem de Energía ─ -->
+    <div style="margin-bottom:3.5rem;">
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;" class="reveal">
+        <div style="font-size:1.3rem;">⚡</div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:.9rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;">Ítem de Energía</div>
+          <div style="font-size:.75rem;color:var(--text-muted);margin-top:.2rem;">Energía infinita por un breve período — permite atacar sin restricción alguna.</div>
+        </div>
+      </div>
+      <div class="duo-grid reveal" style="max-width:1100px;margin-left:auto;margin-right:auto;">
+        <div class="item-card">
+          <video src="Xzatana/energia.mp4" autoplay muted loop playsinline style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;"></video>
+          <div class="item-info">
+            <div class="item-label">Apariencia en el mundo</div>
+            <div class="item-desc">Objeto brillante y reconocible que indica al jugador su presencia en el entorno.</div>
+          </div>
+        </div>
+        <div class="item-card">
+          <video src="Xzatana/energia2.mp4" autoplay muted loop playsinline style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;"></video>
+          <div class="item-info">
+            <div class="item-label">Interacción del personaje</div>
+            <div class="item-desc">Al recogerlo, el personaje obtiene <strong style="color:var(--text);">energía infinita por un breve período</strong>, soltando ataques sin parar.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─ Ítem de Vida ─ -->
+    <div>
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;" class="reveal">
+        <div style="font-size:1.3rem;">❤️</div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:.9rem;font-weight:700;color:#ff6b6b;letter-spacing:1px;text-transform:uppercase;">Ítem de Vida</div>
+          <div style="font-size:.75rem;color:var(--text-muted);margin-top:.2rem;">Recupera 20 puntos de vida de forma instantánea al ser recogido.</div>
+        </div>
+      </div>
+      <div class="duo-grid reveal" style="max-width:1100px;margin-left:auto;margin-right:auto;">
+        <div class="item-card" style="border-color:rgba(255,107,107,.25);">
+          <video src="Xzatana/vida.mp4" autoplay muted loop playsinline style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;"></video>
+          <div class="item-info">
+            <div class="item-label" style="color:#ff6b6b;">Apariencia en el mundo</div>
+            <div class="item-desc">Visualmente distinto al ítem de energía para que el jugador lo identifique a simple vista.</div>
+          </div>
+        </div>
+        <div class="item-card" style="border-color:rgba(255,107,107,.25);">
+          <video src="Xzatana/vida2.mp4" autoplay muted loop playsinline style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;"></video>
+          <div class="item-info">
+            <div class="item-label" style="color:#ff6b6b;">Interacción del personaje</div>
+            <div class="item-desc">Al interactuar con él, el jugador recupera <strong style="color:var(--text);">20 puntos de vida</strong> de manera inmediata.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── ENTORNOS ── -->
+  <section class="proj-section">
+    <div class="section-eyebrow">04 // Entornos</div>
+    <h2 class="prose-title reveal">Cuatro mundos.<br><span class="hl">Una sola misión.</span></h2>
+    <div class="prose reveal" style="margin-bottom:3rem;">
+      <p>
+        El juego recorre cuatro escenarios únicos, cada uno con su propia atmósfera, paleta visual
+        y nivel de dificultad. El jugador avanza de los bosques y cabañas hasta las tierras áridas
+        y las profundidades volcánicas, antes de enfrentarse a Sorad en su fortaleza.
+      </p>
+    </div>
+
+    <div class="duo-grid reveal" style="max-width:1100px;margin-left:auto;margin-right:auto;">
+
+      <!-- Cabañas -->
+      <div style="display:flex;flex-direction:column;gap:.8rem;">
+        <div class="vid-auto media-container" style="border:1px solid var(--border);">
+          <video src="Xzatana/Cabaña.mp4" autoplay muted loop playsinline style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;"></video>
+          <div class="vid-auto-label">// Entorno · Cabañas</div>
+          <div class="media-glow"></div>
+        </div>
+        <div style="padding:.6rem 0;">
+          <div style="font-family:var(--font-display);font-size:.8rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:.4rem;">Cabañas</div>
+          <div style="font-size:.78rem;color:var(--text-muted);line-height:1.8;">El punto de partida. Un entorno boscoso y cálido con estructuras de madera dispersas. Sirve como zona introductoria donde el jugador aprende las mecánicas básicas de movimiento y combate.</div>
+        </div>
+      </div>
+
+      <!-- Desierto -->
+      <div style="display:flex;flex-direction:column;gap:.8rem;">
+        <div class="vid-auto media-container" style="border:1px solid var(--border);">
+          <video src="Xzatana/desierto.mp4" autoplay muted loop playsinline style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;"></video>
+          <div class="vid-auto-label">// Entorno · Desierto</div>
+          <div class="media-glow"></div>
+        </div>
+        <div style="padding:.6rem 0;">
+          <div style="font-family:var(--font-display);font-size:.8rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:.4rem;">Desierto</div>
+          <div style="font-size:.78rem;color:var(--text-muted);line-height:1.8;">Tierras áridas y abiertas donde los enemigos tienen más espacio para flanquear al jugador. La paleta cálida y el entorno despejado crean una sensación de exposición y vulnerabilidad constante.</div>
+        </div>
+      </div>
+
+      <!-- Lava -->
+      <div style="display:flex;flex-direction:column;gap:.8rem;">
+        <div class="vid-auto media-container" style="border:1px solid var(--border);">
+          <video src="Xzatana/lava.mp4" autoplay muted loop playsinline style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;"></video>
+          <div class="vid-auto-label">// Entorno · Lava</div>
+          <div class="media-glow"></div>
+        </div>
+        <div style="padding:.6rem 0;">
+          <div style="font-family:var(--font-display);font-size:.8rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:.4rem;">Lava</div>
+          <div style="font-size:.78rem;color:var(--text-muted);line-height:1.8;">Un entorno volcánico de alta intensidad. El rojo dominante y los charcos de lava añaden peligro ambiental al combate. La presión visual prepara al jugador para lo que viene.</div>
+        </div>
+      </div>
+
+      <!-- Castillo -->
+      <div style="display:flex;flex-direction:column;gap:.8rem;">
+        <div class="vid-auto media-container" style="border:1px solid rgba(0,245,196,.35);">
+          <video src="Xzatana/Castillo.mp4" autoplay muted loop playsinline style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;"></video>
+          <div class="vid-auto-label">// Entorno · Castillo — Escenario Final</div>
+          <div class="media-glow"></div>
+        </div>
+        <div style="padding:.6rem 0;">
+          <div style="font-family:var(--font-display);font-size:.8rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:.4rem;">Castillo — Escenario Final ★</div>
+          <div style="font-size:.78rem;color:var(--text-muted);line-height:1.8;">La fortaleza de Sorad y el clímax de toda la aventura. Arquitectura imponente, atmósfera opresiva y la batalla definitiva que decide el destino del reino. Aquí todo converge.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── VIDEO PROMOCIONAL ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">05 // Tráiler</div>
+    <h2 class="prose-title reveal">El juego completo.<br><span class="hl">En un solo video.</span></h2>
+    <div class="prose reveal" style="margin-bottom:2.5rem;">
+      <p>
+        El video promocional de Xzatana presenta todos los sistemas del juego en profundidad:
+        historia, personajes, mecánicas de combate, entornos y jefe final.
+      </p>
+    </div>
+
+    <div class="reveal" style="max-width:1100px;margin:0 auto;">
+      <div class="media-container">
+        <div class="video-player" data-vid="xzatana">
+          <video id="xzatana" preload="metadata" playsinline>
+            <source src="Xzatana/XZATANA.mp4" type="video/mp4">
+            <source src="https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Xzatana/XZATANA.mp4" type="video/mp4">
+          </video>
+          <div class="vp-init-overlay" id="vpi-xzatana">
+            <button class="vp-big-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+          </div>
+          <div class="vp-seek-flash" id="vsf-xzatana"></div>
+          <div class="vp-controls">
+            <button class="vp-btn" data-action="rewind" title="-10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            </button>
+            <button class="vp-btn" data-action="playpause" title="Play/Pause">
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="vp-btn" data-action="forward" title="+10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+            </button>
+            <div class="vp-progress" data-action="seek">
+              <div class="vp-progress-fill"></div>
+              <div class="vp-progress-thumb"></div>
+            </div>
+            <span class="vp-time">0:00 / 0:00</span>
+            <div class="vp-volume-wrap">
+              <button class="vp-btn" data-action="mute" title="Silenciar / Activar sonido">
+                <svg class="icon-vol" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                <svg class="icon-muted" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19l2 2L21 19.73l-18-18zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+              </button>
+              <input type="range" class="vp-volume-slider" data-action="volume" min="0" max="1" step="0.05" value="1" title="Volumen" style="--vol:100%">
+            </div>
+            <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="media-label">Video promocional — Xzatana</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── NAVEGACIÓN ── -->
+  <div class="next-proj">
+    <a href="index.html#proyectos" class="next-proj-back">
+      <span class="next-arrow-left">←</span>
+      <div>
+        <div class="next-label">Volver</div>
+        <div class="next-title">Todos los proyectos</div>
+      </div>
+    </a>
+    <a href="apartamento.html" class="next-proj-forward">
+      <div style="text-align:right;">
+        <div class="next-label">Siguiente proyecto</div>
+        <div class="next-title">Apartamento VR</div>
+      </div>
+      <span class="next-arrow">→</span>
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Santiago Londoño Mendez © 2026</p>
+    <p>Diseñado y codificado por mí.</p>
+  </footer>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox-overlay" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">✕</button>
+    <img id="lightbox-img" src="" alt="" />
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+  /* =====================================================================
+     VIDEO PLAYER — Tráiler XZATANA (con controles completos)
+     Mismo sistema que apartamento.html
+     ===================================================================== */
+  (function initVideoPlayers() {
+    document.querySelectorAll('.video-player[data-vid]').forEach(function(player) {
+      var vid    = player.dataset.vid;
+      var video  = document.getElementById(vid);
+      var initOv = document.getElementById('vpi-' + vid);
+      var flashEl= document.getElementById('vsf-' + vid);
+      var ppBtn  = player.querySelector('[data-action="playpause"]');
+      var progBar= player.querySelector('[data-action="seek"]');
+      var fill   = progBar ? progBar.querySelector('.vp-progress-fill')  : null;
+      var thumb  = progBar ? progBar.querySelector('.vp-progress-thumb') : null;
+      var timeEl = player.querySelector('.vp-time');
+      if (!video) return;
+
+      function fmtTime(s) {
+        if (!s || isNaN(s)) return '0:00';
+        return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
+      }
+      function showFlash(el, txt) {
+        if (!el) return; el.textContent = txt; el.classList.add('show');
+        setTimeout(function() { el.classList.remove('show'); }, 600);
+      }
+      function syncIcons() {
+        if (!ppBtn) return;
+        var ip = ppBtn.querySelector('.icon-pause');
+        var ipl= ppBtn.querySelector('.icon-play');
+        if (ip)  ip.style.display  = video.paused ? 'none'  : 'block';
+        if (ipl) ipl.style.display = video.paused ? 'block' : 'none';
+      }
+      function updateProgress() {
+        if (!video.duration) return;
+        var pct = (video.currentTime / video.duration) * 100;
+        if (fill)  fill.style.width = pct + '%';
+        if (thumb) thumb.style.left = pct + '%';
+        if (timeEl) timeEl.textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
+      }
+
+      if (initOv) {
+        var bigBtn = initOv.querySelector('.vp-big-btn');
+        function startPlay(e) {
+          if (e) e.stopPropagation();
+          video.play().then(function() {
+            initOv.classList.add('hidden');
+            player.classList.add('active');
+            syncIcons();
+          }).catch(console.error);
+        }
+        if (bigBtn) bigBtn.addEventListener('click', startPlay);
+        initOv.addEventListener('click', startPlay);
+      }
+
+      video.addEventListener('click', function() {
+        if (video.paused) { video.play().then(function() { syncIcons(); player.classList.add('active'); }); }
+        else { video.pause(); syncIcons(); }
+      });
+      if (ppBtn) ppBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (video.paused) { video.play().then(function() { syncIcons(); player.classList.add('active'); }); }
+        else { video.pause(); syncIcons(); }
+      });
+
+      /* fullscreen */
+      var fsIconEnter = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+      var fsIconExit  = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+      player.querySelectorAll('[data-action="fullscreen"]').forEach(function(btn) {
+        var btnSvg = btn.querySelector('svg');
+        function updateFsIcon() {
+          var isFs = (document.fullscreenElement === player || document.webkitFullscreenElement === player);
+          if (btnSvg) btnSvg.innerHTML = isFs ? fsIconExit : fsIconEnter;
+          btn.title = isFs ? 'Salir de pantalla completa' : 'Pantalla completa';
+        }
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var isFs = (document.fullscreenElement === player || document.webkitFullscreenElement === player);
+          if (isFs) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
+          else { (player.requestFullscreen || player.webkitRequestFullscreen).call(player); }
+        });
+        document.addEventListener('fullscreenchange', updateFsIcon);
+        document.addEventListener('webkitfullscreenchange', updateFsIcon);
+      });
+
+      /* mute / volumen */
+      var muteBtn   = player.querySelector('[data-action="mute"]');
+      var volSlider = player.querySelector('[data-action="volume"]');
+      function syncVolIcons() {
+        if (!muteBtn) return;
+        var isMuted   = video.muted || video.volume === 0;
+        var iconVol   = muteBtn.querySelector('.icon-vol');
+        var iconMuted = muteBtn.querySelector('.icon-muted');
+        if (iconVol)   iconVol.style.display   = isMuted ? 'none'  : 'block';
+        if (iconMuted) iconMuted.style.display  = isMuted ? 'block' : 'none';
+      }
+      if (muteBtn) muteBtn.addEventListener('click', function(e) {
+        e.stopPropagation(); video.muted = !video.muted;
+        if (volSlider) { volSlider.value = video.muted ? 0 : video.volume; volSlider.style.setProperty('--vol', (video.muted ? 0 : video.volume * 100) + '%'); }
+        syncVolIcons();
+      });
+      if (volSlider) volSlider.addEventListener('input', function(e) {
+        e.stopPropagation(); video.volume = parseFloat(this.value); video.muted = video.volume === 0;
+        this.style.setProperty('--vol', (video.volume * 100) + '%'); syncVolIcons();
+      });
+
+      /* rewind / forward */
+      player.querySelectorAll('[data-action="rewind"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) { e.stopPropagation(); video.currentTime = Math.max(0, video.currentTime - 10); showFlash(flashEl, '← 10s'); updateProgress(); });
+      });
+      player.querySelectorAll('[data-action="forward"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) { e.stopPropagation(); video.currentTime = Math.min(video.duration || 0, video.currentTime + 10); showFlash(flashEl, '+10s →'); updateProgress(); });
+      });
+
+      /* seek drag sin trabado */
+      if (progBar) {
+        var seeking = false, wasPlaying = false, _seekPct;
+        progBar.addEventListener('mousedown', function(e) {
+          e.stopPropagation(); seeking = true; wasPlaying = !video.paused; video.pause();
+          var rect = progBar.getBoundingClientRect();
+          _seekPct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          if (fill)  fill.style.width = (_seekPct * 100) + '%';
+          if (thumb) thumb.style.left = (_seekPct * 100) + '%';
+        });
+        window.addEventListener('mousemove', function(e) {
+          if (!seeking) return;
+          var rect = progBar.getBoundingClientRect();
+          _seekPct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          if (fill)  fill.style.width = (_seekPct * 100) + '%';
+          if (thumb) thumb.style.left = (_seekPct * 100) + '%';
+        });
+        window.addEventListener('mouseup', function() {
+          if (!seeking) return; seeking = false;
+          if (typeof _seekPct === 'number') { video.currentTime = _seekPct * (video.duration || 0); _seekPct = undefined; }
+          if (wasPlaying) video.play().then(syncIcons);
+        });
+      }
+
+      video.addEventListener('timeupdate', updateProgress);
+      video.addEventListener('loadedmetadata', updateProgress);
+      video.addEventListener('ended', function() {
+        initOv && initOv.classList.remove('hidden'); syncIcons();
+      });
+    });
+  })();
+  </script>
+
+</body>
+</html>

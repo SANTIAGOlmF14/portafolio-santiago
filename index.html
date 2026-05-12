@@ -195,43 +195,222 @@
   <section class="habilidades" id="habilidades">
     <div class="section-tag">02 // Skills</div>
     <h2 class="section-title reveal">Mi arsenal</h2>
+    <p style="font-size:.75rem;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:2.5rem;" class="reveal">// Click en cada skill para ver más</p>
     <div class="skills-grid">
-      <div class="skill-card reveal" data-delay="0">
-        <div class="skill-icon">🎮</div>
-        <h3>Game Dev</h3>
-        <p>Unity · Visual Studio Code · C#</p>
+
+      <!-- GAME DEV -->
+      <div class="skill-card reveal skill-card--expandable" data-delay="0" data-skill="gamedev">
+        <div class="skill-card-header">
+          <div class="skill-icon">🎮</div>
+          <div class="skill-header-text">
+            <h3>Game Dev</h3>
+            <p>Unity · Visual Studio Code · C#</p>
+          </div>
+          <div class="skill-expand-arrow">›</div>
+        </div>
         <div class="skill-bar"><div class="skill-fill" style="--w: 85%"></div></div>
+        <div class="skill-expand-panel">
+          <div class="skill-exp-divider"></div>
+          <div class="skill-exp-stats">
+            <div class="skill-stat"><span class="skill-stat-val">3+</span><span class="skill-stat-label">Proyectos Unity</span></div>
+            <div class="skill-stat"><span class="skill-stat-val">85%</span><span class="skill-stat-label">Dominio</span></div>
+            <div class="skill-stat"><span class="skill-stat-val">C#</span><span class="skill-stat-label">Lenguaje</span></div>
+          </div>
+          <div class="skill-exp-tags">
+            <span class="skill-tag">Unity Engine</span>
+            <span class="skill-tag">C# Scripting</span>
+            <span class="skill-tag">Physics 3D</span>
+            <span class="skill-tag">Animaciones</span>
+            <span class="skill-tag">NPCs & AI</span>
+            <span class="skill-tag">VR Integration</span>
+          </div>
+          <div class="skill-exp-evidence">
+            <div class="skill-ev-label">// Evidencia</div>
+            <div class="skill-ev-item">→ Xzatana: juego completo con combate, ítems, NPC y jefe final</div>
+            <div class="skill-ev-item">→ Apartamento VR: simulación inmersiva para Oculus en Unity</div>
+            <div class="skill-ev-item">→ Sistema de combate, diálogos flotantes e IA de enemigos</div>
+          </div>
+        </div>
       </div>
-      <div class="skill-card reveal" data-delay="1">
-        <div class="skill-icon">🧊</div>
-        <h3>3D & Animación</h3>
-        <p>Blender · SolidWorks</p>
+
+      <!-- 3D & ANIMACIÓN -->
+      <div class="skill-card reveal skill-card--expandable" data-delay="1" data-skill="3d">
+        <div class="skill-card-header">
+          <div class="skill-icon">🧊</div>
+          <div class="skill-header-text">
+            <h3>3D & Animación</h3>
+            <p>Blender · SolidWorks</p>
+          </div>
+          <div class="skill-expand-arrow">›</div>
+        </div>
         <div class="skill-bar"><div class="skill-fill" style="--w: 80%"></div></div>
+        <div class="skill-expand-panel">
+          <div class="skill-exp-divider"></div>
+          <div class="skill-exp-stats">
+            <div class="skill-stat"><span class="skill-stat-val">2</span><span class="skill-stat-label">Softwares</span></div>
+            <div class="skill-stat"><span class="skill-stat-val">80%</span><span class="skill-stat-label">Dominio</span></div>
+            <div class="skill-stat"><span class="skill-stat-val">PBR</span><span class="skill-stat-label">Pipeline</span></div>
+          </div>
+          <div class="skill-exp-tags">
+            <span class="skill-tag">Modelado</span>
+            <span class="skill-tag">Texturizado</span>
+            <span class="skill-tag">Rigging</span>
+            <span class="skill-tag">Shaders</span>
+            <span class="skill-tag">SolidWorks</span>
+            <span class="skill-tag">Impresión 3D</span>
+          </div>
+          <div class="skill-exp-evidence">
+            <div class="skill-ev-label">// Evidencia</div>
+            <div class="skill-ev-item">→ Alyra: personaje 3D original con modelado, pelo y rigging</div>
+            <div class="skill-ev-item">→ ListenMove: carcasa diseñada en Blender e impresa en 3D</div>
+            <div class="skill-ev-item">→ Modelado técnico en SolidWorks para proyectos de hardware</div>
+          </div>
+        </div>
       </div>
-      <div class="skill-card reveal" data-delay="2">
-        <div class="skill-icon">🥽</div>
-        <h3>VR / AR</h3>
-        <p>Prototipos de Realidad Virtual y Aumentada</p>
+
+      <!-- VR / AR -->
+      <div class="skill-card reveal skill-card--expandable" data-delay="2" data-skill="vr">
+        <div class="skill-card-header">
+          <div class="skill-icon">🥽</div>
+          <div class="skill-header-text">
+            <h3>VR / AR</h3>
+            <p>Realidad Virtual y Aumentada</p>
+          </div>
+          <div class="skill-expand-arrow">›</div>
+        </div>
         <div class="skill-bar"><div class="skill-fill" style="--w: 75%"></div></div>
+        <div class="skill-expand-panel">
+          <div class="skill-exp-divider"></div>
+          <div class="skill-exp-stats">
+            <div class="skill-stat"><span class="skill-stat-val">Oculus</span><span class="skill-stat-label">Plataforma</span></div>
+            <div class="skill-stat"><span class="skill-stat-val">75%</span><span class="skill-stat-label">Dominio</span></div>
+            <div class="skill-stat"><span class="skill-stat-val">XR</span><span class="skill-stat-label">Stack</span></div>
+          </div>
+          <div class="skill-exp-tags">
+            <span class="skill-tag">Oculus SDK</span>
+            <span class="skill-tag">XR Toolkit</span>
+            <span class="skill-tag">Navegación VR</span>
+            <span class="skill-tag">Interacción</span>
+            <span class="skill-tag">Espacio 3D</span>
+          </div>
+          <div class="skill-exp-evidence">
+            <div class="skill-ev-label">// Evidencia</div>
+            <div class="skill-ev-item">→ Apartamento VR: navegación libre y personalización en Oculus</div>
+            <div class="skill-ev-item">→ Control de iluminación e interacción total con el entorno</div>
+            <div class="skill-ev-item">→ Implementación con Unity XR Toolkit y Oculus Integration</div>
+          </div>
+        </div>
       </div>
-      <div class="skill-card reveal" data-delay="3">
-        <div class="skill-icon">🎨</div>
-        <h3>Diseño Multimedia</h3>
-        <p>Photoshop · Illustrator · After Effects · Premiere</p>
+
+      <!-- DISEÑO MULTIMEDIA -->
+      <div class="skill-card reveal skill-card--expandable" data-delay="3" data-skill="design">
+        <div class="skill-card-header">
+          <div class="skill-icon">🎨</div>
+          <div class="skill-header-text">
+            <h3>Diseño Multimedia</h3>
+            <p>Photoshop · Illustrator · After Effects · Premiere</p>
+          </div>
+          <div class="skill-expand-arrow">›</div>
+        </div>
         <div class="skill-bar"><div class="skill-fill" style="--w: 80%"></div></div>
+        <div class="skill-expand-panel">
+          <div class="skill-exp-divider"></div>
+          <div class="skill-exp-stats">
+            <div class="skill-stat"><span class="skill-stat-val">4</span><span class="skill-stat-label">Herramientas CC</span></div>
+            <div class="skill-stat"><span class="skill-stat-val">80%</span><span class="skill-stat-label">Dominio</span></div>
+            <div class="skill-stat"><span class="skill-stat-val">AV</span><span class="skill-stat-label">Producción</span></div>
+          </div>
+          <div class="skill-exp-tags">
+            <span class="skill-tag">Photoshop</span>
+            <span class="skill-tag">Illustrator</span>
+            <span class="skill-tag">After Effects</span>
+            <span class="skill-tag">Premiere Pro</span>
+            <span class="skill-tag">Motion Graphics</span>
+            <span class="skill-tag">Edición de video</span>
+          </div>
+          <div class="skill-exp-evidence">
+            <div class="skill-ev-label">// Evidencia</div>
+            <div class="skill-ev-item">→ Tráiler promocional de Xzatana editado y producido</div>
+            <div class="skill-ev-item">→ Assets visuales e íconos para proyectos de juego</div>
+            <div class="skill-ev-item">→ Materiales gráficos para presentaciones académicas y portafolio</div>
+          </div>
+        </div>
       </div>
-      <div class="skill-card reveal" data-delay="4">
-        <div class="skill-icon">🌐</div>
-        <h3>Web</h3>
-        <p>HTML · CSS · JavaScript · Interfaces interactivas</p>
+
+      <!-- WEB -->
+      <div class="skill-card reveal skill-card--expandable" data-delay="4" data-skill="web">
+        <div class="skill-card-header">
+          <div class="skill-icon">🌐</div>
+          <div class="skill-header-text">
+            <h3>Web</h3>
+            <p>HTML · CSS · JavaScript · Interfaces interactivas</p>
+          </div>
+          <div class="skill-expand-arrow">›</div>
+        </div>
         <div class="skill-bar"><div class="skill-fill" style="--w: 70%"></div></div>
+        <div class="skill-expand-panel">
+          <div class="skill-exp-divider"></div>
+          <div class="skill-exp-stats">
+            <div class="skill-stat"><span class="skill-stat-val">3</span><span class="skill-stat-label">Lenguajes</span></div>
+            <div class="skill-stat"><span class="skill-stat-val">70%</span><span class="skill-stat-label">Dominio</span></div>
+            <div class="skill-stat"><span class="skill-stat-val">UI</span><span class="skill-stat-label">Especialidad</span></div>
+          </div>
+          <div class="skill-exp-tags">
+            <span class="skill-tag">HTML5</span>
+            <span class="skill-tag">CSS3</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">Animaciones CSS</span>
+            <span class="skill-tag">Video players</span>
+            <span class="skill-tag">Diseño responsive</span>
+          </div>
+          <div class="skill-exp-evidence">
+            <div class="skill-ev-label">// Evidencia</div>
+            <div class="skill-ev-item">→ Este portafolio: construido desde cero sin frameworks</div>
+            <div class="skill-ev-item">→ Partículas, cursores custom, slideshows y players a medida</div>
+            <div class="skill-ev-item">→ Maquinas Virtuales: configuración de servidores web Apache y Nginx</div>
+          </div>
+        </div>
       </div>
-      <div class="skill-card reveal" data-delay="5">
-        <div class="skill-icon">🤖</div>
-        <h3>Inteligencia Artificial</h3>
-        <p>Especialización en curso · Modelos generativos</p>
-        <div class="skill-bar"><div class="skill-fill" style="--w: 50%"></div></div>
+
+      <!-- INTELIGENCIA ARTIFICIAL -->
+      <div class="skill-card reveal skill-card--expandable" data-delay="5" data-skill="ai">
+        <div class="skill-card-header">
+          <div class="skill-icon">🤖</div>
+          <div class="skill-header-text">
+            <h3>Inteligencia Artificial</h3>
+            <p>ML · Computer Vision · Redes Neuronales</p>
+          </div>
+          <div class="skill-expand-arrow">›</div>
+        </div>
+        <div class="skill-bar"><div class="skill-fill" style="--w: 80%"></div></div>
+        <div class="skill-expand-panel">
+          <div class="skill-exp-divider"></div>
+          <div class="skill-exp-stats">
+            <div class="skill-stat"><span class="skill-stat-val">Redes</span><span class="skill-stat-label">Neuronales</span></div>
+            <div class="skill-stat"><span class="skill-stat-val">80%</span><span class="skill-stat-label">Dominio</span></div>
+            <div class="skill-stat"><span class="skill-stat-val">CV</span><span class="skill-stat-label">Especialidad</span></div>
+          </div>
+          <div class="skill-exp-tags">
+            <span class="skill-tag">Redes Neuronales</span>
+            <span class="skill-tag">Computer Vision</span>
+            <span class="skill-tag">Modelos predictivos</span>
+            <span class="skill-tag">Detección de objetos</span>
+            <span class="skill-tag">Segmentación</span>
+            <span class="skill-tag">Datasets propios</span>
+            <span class="skill-tag">Transfer Learning</span>
+            <span class="skill-tag">Modelos generativos</span>
+          </div>
+          <div class="skill-exp-evidence">
+            <div class="skill-ev-label">// Evidencia</div>
+            <div class="skill-ev-item">→ Redes neuronales creadas desde cero para clasificación y predicción</div>
+            <div class="skill-ev-item">→ Modelos de segmentación y detección de objetos con datasets propios</div>
+            <div class="skill-ev-item">→ Datasets anotados y entrenados manualmente para casos reales</div>
+            <div class="skill-ev-item">→ Aplicativos con modelos preentrenados adaptados a problemas específicos</div>
+            <div class="skill-ev-item">→ Especialización universitaria finalizando — base técnica sólida</div>
+          </div>
+        </div>
       </div>
+
     </div>
   </section>
 
@@ -241,6 +420,26 @@
     <h2 class="section-title reveal">Lo que he construido</h2>
     <div class="proyectos-grid">
       <div class="proyecto-card reveal" data-delay="0">
+        <div class="proyecto-img" style="position:relative; overflow:hidden; background:#060a14;">
+          <img id="xz-slide-1" src="Xzatana/Protagonistas.png" alt="Xzatana — Protagonista y NPC"
+            style="width:100%;height:100%;object-fit:cover;object-position:center center;position:absolute;inset:0;opacity:1;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="xz-slide-2" src="Xzatana/Enemigos.png" alt="Xzatana — Los tres enemigos"
+            style="width:100%;height:100%;object-fit:cover;object-position:center center;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="xz-slide-3" src="Xzatana/Entorno.png" alt="Xzatana — Entorno cabañas"
+            style="width:100%;height:100%;object-fit:cover;object-position:center center;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="xz-slide-4" src="Xzatana/Arma.png" alt="Xzatana — Protagonista con el arma"
+            style="width:100%;height:100%;object-fit:cover;object-position:center center;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="xz-slide-5" src="Xzatana/Soporte.png" alt="Xzatana — NPC y sistema de soporte"
+            style="width:100%;height:100%;object-fit:cover;object-position:center center;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <div class="proyecto-overlay"><a href="xzatana.html" class="proyecto-link">Ver más →</a></div>
+        </div>
+        <div class="proyecto-info">
+          <span class="proyecto-tag">Unity · C# · PC · Hack &amp; Slash · 3D</span>
+          <h3>Xzatana — Videojuego 3D</h3>
+          <p>Videojuego de acción en tercera persona desarrollado en Unity para PC. Combate con combos, ítems coleccionables, NPC de soporte, cuatro entornos únicos y un jefe final imponente.</p>
+        </div>
+      </div>
+      <div class="proyecto-card reveal" data-delay="1">
         <div class="proyecto-img" style="position:relative; overflow:hidden; background:#060d10;">
           <img id="ap-slide-1" src="Apartamento/Unity1.png" alt="Apartamento VR — Vista general"
             style="width:100%;height:100%;object-fit:cover;object-position:center center;position:absolute;inset:0;opacity:1;transition:opacity 1.2s ease;will-change:opacity;"/>
@@ -428,6 +627,154 @@
     }
     /* ── CV modal close hover ── */
     #cv-close-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ═══════════════════════════════════════════════
+       SKILL CARDS — EXPANDIBLES
+    ═══════════════════════════════════════════════ */
+    /* Fix: el grid no debe estirar las celdas hermanas cuando una se abre */
+    .skills-grid {
+      align-items: start !important;
+    }
+    .skill-card--expandable {
+      cursor: none;
+      transition: border-color .3s;
+      overflow: hidden;
+      align-self: start;
+    }
+    .skill-card--expandable:hover {
+      border-color: rgba(0,245,196,.4);
+    }
+    .skill-card-header {
+      display: flex;
+      align-items: center;
+      gap: .9rem;
+    }
+    .skill-card-header .skill-icon {
+      margin: 0;
+      flex-shrink: 0;
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .skill-header-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .skill-header-text h3 {
+      margin: 0 0 .2rem;
+    }
+    .skill-header-text p {
+      margin: 0;
+      font-size: .72rem;
+    }
+    .skill-expand-arrow {
+      font-size: 1.4rem;
+      color: var(--accent);
+      transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .2s;
+      opacity: .5;
+      line-height: 1;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .skill-card--expandable.open .skill-expand-arrow {
+      transform: rotate(90deg);
+      opacity: 1;
+    }
+
+    /* Panel oculto */
+    .skill-expand-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .45s cubic-bezier(.4,0,.2,1), opacity .35s;
+      opacity: 0;
+    }
+    .skill-card--expandable.open .skill-expand-panel {
+      max-height: 400px;
+      opacity: 1;
+    }
+
+    .skill-exp-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.2rem 0 1rem;
+    }
+
+    /* Mini stats row */
+    .skill-exp-stats {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .skill-stat {
+      flex: 1;
+      background: rgba(0,245,196,.04);
+      border: 1px solid rgba(0,245,196,.12);
+      padding: .55rem .5rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
+    }
+    .skill-stat-val {
+      font-family: var(--font-display);
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+    .skill-stat-label {
+      font-size: .55rem;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* Tags de herramientas */
+    .skill-exp-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      margin-bottom: 1rem;
+    }
+    .skill-tag {
+      font-size: .6rem;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      border: 1px solid rgba(0,245,196,.25);
+      padding: .25rem .6rem;
+      text-transform: uppercase;
+      background: rgba(0,245,196,.04);
+      transition: background .2s, border-color .2s;
+    }
+    .skill-tag:hover {
+      background: rgba(0,245,196,.1);
+      border-color: rgba(0,245,196,.5);
+    }
+
+    /* Evidencia / justificación */
+    .skill-exp-evidence {
+      padding: .7rem .8rem;
+      background: rgba(123,97,255,.04);
+      border-left: 2px solid rgba(123,97,255,.4);
+    }
+    .skill-ev-label {
+      font-size: .58rem;
+      letter-spacing: 3px;
+      color: rgba(123,97,255,.9);
+      text-transform: uppercase;
+      margin-bottom: .5rem;
+    }
+    .skill-ev-item {
+      font-size: .72rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .skill-ev-item + .skill-ev-item {
+      margin-top: .15rem;
+    }
   </style>
 
   <script src="script.js"></script>
@@ -653,6 +1000,24 @@ video.addEventListener('ended', function() {
     }, 4000);
   }
   resetSlideshow();
+    /* ── Xzatana card slideshow (5 imágenes) ── */
+    (function xzSlide() {
+      const slides = [
+        document.getElementById('xz-slide-1'),
+        document.getElementById('xz-slide-2'),
+        document.getElementById('xz-slide-3'),
+        document.getElementById('xz-slide-4'),
+        document.getElementById('xz-slide-5'),
+      ];
+      if (!slides[0]) return;
+      let cur = 0;
+      setInterval(() => {
+        slides[cur].style.opacity = '0';
+        cur = (cur + 1) % slides.length;
+        slides[cur].style.opacity = '1';
+      }, 2800);
+    })();
+
     /* ── Apartamento card slideshow (3 imágenes) ── */
     (function apSlide() {
       const slides = [
@@ -747,6 +1112,27 @@ video.addEventListener('ended', function() {
         if (e.key === 'Escape') closeModal();
       });
     })();
+    /* ── Skill cards expandibles ── */
+    (function skillExpand() {
+      document.querySelectorAll('.skill-card--expandable').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var isOpen = card.classList.contains('open');
+          // Cerrar todas
+          document.querySelectorAll('.skill-card--expandable.open').forEach(function(c) {
+            c.classList.remove('open');
+          });
+          // Abrir la que se clickeó (si no estaba abierta)
+          if (!isOpen) {
+            card.classList.add('open');
+            // scroll suave para que se vea completa
+            setTimeout(function() {
+              card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 60);
+          }
+        });
+      });
+    })();
+
   </script>
 </body>
 </html>
