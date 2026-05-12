@@ -548,7 +548,7 @@
             <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" style="flex-shrink:0;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
             Ver CV
           </button>
-          <a href="https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Media/CV.pdf" download="CV_Santiago_Londono.pdf" class="btn-ghost">
+          <a href="Media/CV.pdf" download="CV_Santiago_Londono.pdf" class="btn-ghost">
             <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" style="flex-shrink:0;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
             Descargar
           </a>
@@ -563,7 +563,7 @@
       <div style="display:flex; align-items:center; justify-content:space-between;">
         <span style="font-size:.65rem; letter-spacing:4px; text-transform:uppercase; color:var(--accent);">// CV — Santiago Londoño</span>
         <div style="display:flex; gap:.8rem; align-items:center;">
-          <a href="https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Media/CV.pdf" download="CV_Santiago_Londono.pdf" class="btn-ghost" style="font-size:.7rem; padding:.45rem 1rem; gap:.4rem; display:inline-flex; align-items:center;">
+          <a href="Media/CV.pdf" download="CV_Santiago_Londono.pdf" class="btn-ghost" style="font-size:.7rem; padding:.45rem 1rem; gap:.4rem; display:inline-flex; align-items:center;">
             <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
             Descargar
           </a>
@@ -1091,7 +1091,10 @@ video.addEventListener('ended', function() {
 
       openBtn.addEventListener('click', function() {
         if (!frame.src || frame.src === window.location.href) {
-          frame.src = 'https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Media/CV.pdf';
+          const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+          frame.src = isLocal
+            ? 'Media/CV.pdf'
+            : 'https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Media/CV.pdf';
         }
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
