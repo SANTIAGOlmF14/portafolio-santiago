@@ -888,5 +888,23 @@
   })();
   </script>
 
+
+  <script>
+    /* ===== FORZAR AUTOPLAY EN VIDEOS LFS ===== */
+    document.querySelectorAll('video[autoplay]').forEach(function(v) {
+      v.muted = true;
+      var tryPlay = function() {
+        v.play().catch(function() {
+          setTimeout(tryPlay, 500);
+        });
+      };
+      if (v.readyState >= 3) {
+        tryPlay();
+      } else {
+        v.addEventListener('canplay', tryPlay, { once: true });
+        v.load();
+      }
+    });
+  </script>
 </body>
 </html>
