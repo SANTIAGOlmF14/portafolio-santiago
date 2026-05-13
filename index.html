@@ -587,30 +587,12 @@
             <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
             Descargar
           </a>
-          <button id="cv-close-btn" style="background:none; border:1px solid var(--border); color:var(--text-muted); width:34px; height:34px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; flex-shrink:0;" title="Cerrar">
+          <button id="cv-close-btn" style="background:none; border:1px solid var(--border); color:var(--text-muted); width:34px; height:34px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .25s; flex-shrink:0;" title="Cerrar">
             <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
           </button>
         </div>
       </div>
       <iframe src="" id="cv-frame" style="flex:1; border:1px solid var(--border); background:#fff; width:100%;"></iframe>
-      <!-- Fallback para GitHub Pages (se muestra con JS cuando iframe no funciona) -->
-      <div id="cv-fallback" style="display:none; flex:1; border:1px solid var(--border); background:var(--bg2); width:100%; align-items:center; justify-content:center; flex-direction:column; gap:2rem; text-align:center; padding:3rem;">
-        <div style="font-size:3rem; opacity:.3;">📄</div>
-        <div>
-          <p style="font-size:.8rem; color:var(--text-muted); letter-spacing:1px; margin-bottom:.5rem;">La previsualización no está disponible en este entorno.</p>
-          <p style="font-size:.7rem; color:var(--text-muted); opacity:.6;">Puedes abrirlo directamente o descargarlo.</p>
-        </div>
-        <div style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;">
-          <a id="cv-open-link" href="#" target="_blank" class="btn-primary" style="font-size:.75rem; padding:.6rem 1.4rem; display:inline-flex; align-items:center; gap:.5rem;">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-            Abrir CV
-          </a>
-          <a id="cv-dl-link" href="#" download="CV_Santiago_Londono.pdf" class="btn-ghost" style="font-size:.75rem; padding:.6rem 1.4rem; display:inline-flex; align-items:center; gap:.5rem;">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
-            Descargar
-          </a>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -657,6 +639,13 @@
     #cv-modal a, #cv-modal button {
       cursor: pointer !important;
     }
+    #cv-close-btn:hover {
+      border-color: var(--accent) !important;
+      color: var(--accent) !important;
+      background: rgba(0,245,196,.1) !important;
+      box-shadow: 0 0 12px rgba(0,245,196,.3) !important;
+      transform: scale(1.12) !important;
+    }
     /* Ocultar el cursor custom mientras el modal está abierto */
     body.cv-open .cursor,
     body.cv-open .cursor-trail {
@@ -664,7 +653,7 @@
       pointer-events: none !important;
     }
     /* ── CV modal close hover ── */
-    #cv-close-btn:hover { border-color: var(--accent); color: var(--accent); }
+    /* ── CV modal close hover ya definido arriba ── */
 
     /* ═══════════════════════════════════════════════
        SKILL CARDS — EXPANDIBLES
@@ -1123,32 +1112,16 @@ video.addEventListener('ended', function() {
     (function cvModal() {
       const modal    = document.getElementById('cv-modal');
       const frame    = document.getElementById('cv-frame');
-      const fallback = document.getElementById('cv-fallback');
       const openBtn  = document.getElementById('cv-preview-btn');
       const closeBtn = document.getElementById('cv-close-btn');
-      const openLink = document.getElementById('cv-open-link');
-      const dlLink   = document.getElementById('cv-dl-link');
       if (!modal || !openBtn) return;
 
-      const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-      const rawUrl  = 'https://raw.githubusercontent.com/SANTIAGOlmF14/portafolio-santiago/main/Media/CV.pdf';
-      const localUrl = 'Media/CV.pdf';
-      const pdfUrl  = isLocal ? localUrl : rawUrl;
-
-      // Actualiza los links del fallback
-      if (openLink) openLink.href = pdfUrl;
-      if (dlLink)   dlLink.href  = pdfUrl;
-
       openBtn.addEventListener('click', function() {
-        if (isLocal) {
-          // Local: iframe nativo funciona perfecto
-          if (!frame.src || frame.src === window.location.href) frame.src = localUrl;
-          frame.style.display = '';
-          if (fallback) fallback.style.display = 'none';
-        } else {
-          // GitHub Pages: iframe de PDFs no funciona → mostrar fallback elegante
-          frame.style.display = 'none';
-          if (fallback) fallback.style.display = 'flex';
+        if (!frame.src || frame.src === window.location.href) {
+          const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+          frame.src = isLocal
+            ? 'Media/CV.pdf'
+            : 'https://raw.githubusercontent.com/SANTIAGOlmF14/portafolio-santiago/main/Media/CV.pdf';
         }
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
