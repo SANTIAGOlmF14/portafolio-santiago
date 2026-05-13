@@ -472,6 +472,26 @@
         </div>
       </div>
       <div class="proyecto-card reveal" data-delay="2">
+        <div class="proyecto-img" style="position:relative; overflow:hidden; background:#0a0608;">
+          <img id="dm-slide-1" src="Demonio/Texturafrente.jpg" alt="Demonio — Textura frontal"
+            style="width:100%;height:100%;object-fit:cover;object-position:center top;position:absolute;inset:0;opacity:1;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="dm-slide-2" src="Demonio/motion2.png" alt="Demonio — Animación"
+            style="width:100%;height:100%;object-fit:cover;object-position:center top;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="dm-slide-3" src="Demonio/final.png" alt="Demonio — Pose final"
+            style="width:100%;height:100%;object-fit:cover;object-position:center top;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="dm-slide-4" src="Demonio/boca1.jpg" alt="Demonio — Detalle boca"
+            style="width:100%;height:100%;object-fit:cover;object-position:center top;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="dm-slide-5" src="Demonio/turnaround character.jpg" alt="Demonio — Turnaround"
+            style="width:100%;height:100%;object-fit:cover;object-position:center top;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <div class="proyecto-overlay"><a href="demonio.html" class="proyecto-link">Ver más →</a></div>
+        </div>
+        <div class="proyecto-info">
+          <span class="proyecto-tag">Blender · Substance Painter · 3D · Animación · Premiere Pro</span>
+          <h3>Demonio — Modelo 3D Original</h3>
+          <p>Demonio modelado desde cero en Blender, texturizado en Substance Painter y animado con rigging completo. Dos videos finales editados en Premiere con escenario, lluvia, efectos de luz y música.</p>
+        </div>
+      </div>
+      <div class="proyecto-card reveal" data-delay="2">
         <div class="proyecto-img" style="position:relative; overflow:hidden; background:#000;">
           <!-- Slideshow: Blender1 ↔ Carcasa1 -->
           <img
@@ -1136,6 +1156,18 @@ video.addEventListener('ended', function() {
       });
     })();
 
-  </script>
+  
+  /* Slideshow — Demonio */
+  (function() {
+    const slides = ['dm-slide-1','dm-slide-2','dm-slide-3','dm-slide-4','dm-slide-5'].map(id => document.getElementById(id)).filter(Boolean);
+    if (!slides.length) return;
+    let cur = 0;
+    setInterval(() => {
+      slides[cur].style.opacity = '0';
+      cur = (cur + 1) % slides.length;
+      slides[cur].style.opacity = '1';
+    }, 3000);
+  })();
+</script>
 </body>
 </html>

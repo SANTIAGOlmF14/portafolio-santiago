@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demonio — Modelo 3D | SLM</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    /* ===== PROYECTO DETAIL PAGE ===== */
+    .proj-hero {
+      min-height: 100vh;
+      display: flex; align-items: flex-end;
+      padding: 0 4rem 5rem;
+      position: relative; overflow: hidden; z-index: 1;
+    }
+    .proj-hero-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 30%, rgba(0,245,196,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(123,97,255,0.06) 0%, transparent 50%);
+      z-index: 0;
+    }
+    .proj-hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,245,196,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,196,.03) 1px, transparent 1px);
+      background-size: 60px 60px; pointer-events: none;
+    }
+    .proj-hero-visual {
+      position: absolute; inset: 0; z-index: 0;
+    }
+    .proj-hero-visual img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center top;
+      opacity: 0.07; filter: grayscale(60%) contrast(1.3);
+    }
+    .proj-hero-content { position: relative; z-index: 2; max-width: 800px; }
+    .back-link {
+      display: inline-flex; align-items: center; gap: .6rem;
+      font-size: .7rem; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 3rem;
+      transition: color .2s; cursor: none;
+    }
+    .back-link:hover { color: var(--accent); }
+    .back-link .arrow { font-size: 1rem; transition: transform .2s; }
+    .back-link:hover .arrow { transform: translateX(-4px); }
+    .proj-category {
+      font-size: .7rem; letter-spacing: 4px; color: var(--accent);
+      text-transform: uppercase; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .proj-category::before {
+      content: ''; display: block; width: 30px; height: 1px; background: var(--accent);
+    }
+    .proj-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 6vw, 5.5rem);
+      font-weight: 900; line-height: .95;
+      letter-spacing: -2px; margin-bottom: 1.5rem;
+    }
+    .proj-title span {
+      display: block; color: transparent;
+      -webkit-text-stroke: 2px var(--accent);
+    }
+    .proj-subtitle {
+      font-size: .9rem; color: var(--text-muted);
+      max-width: 550px; line-height: 1.8; margin-bottom: 2.5rem;
+    }
+    .proj-meta { display: flex; gap: 2.5rem; flex-wrap: wrap; }
+    .proj-meta-item { display: flex; flex-direction: column; gap: .25rem; }
+    .proj-meta-label { font-size: .6rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; }
+    .proj-meta-val { font-size: .82rem; color: var(--accent); font-family: var(--font-display); font-weight: 700; }
+    .proj-scroll-hint {
+      position: absolute; right: 4rem; bottom: 3rem;
+      display: flex; flex-direction: column; align-items: center;
+      gap: .8rem; font-size: .6rem; letter-spacing: 3px;
+      color: var(--text-muted); text-transform: uppercase; z-index: 2;
+    }
+    .proj-scroll-line {
+      width: 1px; height: 60px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity:.4; transform: scaleY(1); }
+      50% { opacity:1; transform: scaleY(1.2); }
+    }
+
+    /* ===== SECTIONS ===== */
+    .proj-section { position: relative; z-index: 1; padding: 6rem 4rem; }
+    .proj-section--dark {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .section-eyebrow {
+      font-size: .65rem; letter-spacing: 4px;
+      color: var(--accent); text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .prose-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 700; margin-bottom: 2rem;
+      letter-spacing: -1px; line-height: 1.1;
+    }
+    .prose-title .hl  { color: var(--accent); }
+    .prose-title .hl2 { color: var(--accent2); }
+    .prose { max-width: 680px; color: var(--text-muted); font-size: .88rem; line-height: 1.9; }
+    .prose p { margin-bottom: 1.2rem; }
+    .prose strong { color: var(--text); }
+
+    /* ===== VISTAS GRID ===== */
+    .vistas-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem; margin-top: 2.5rem;
+    }
+    .vistas-grid.col3 { grid-template-columns: repeat(3, 1fr); }
+    .vista-card {
+      position: relative; overflow: hidden;
+      background: #000; border: 1px solid var(--border);
+      cursor: zoom-in; transition: border-color .3s;
+    }
+    .vista-card:hover { border-color: rgba(0,245,196,.5); }
+    .vista-card img {
+      width: 100%; height: 300px;
+      display: block; object-fit: cover;
+      transition: transform .4s, filter .3s;
+    }
+    .vistas-grid.col3 .vista-card img { height: 260px; }
+    .vista-card:hover img { transform: scale(1.03); filter: brightness(1.08); }
+    .vista-card-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: .5rem .8rem;
+      background: linear-gradient(transparent, rgba(0,0,0,.85));
+      font-size: .6rem; letter-spacing: 2px;
+      color: var(--accent); text-transform: uppercase;
+    }
+    .vista-glow {
+      position: absolute; inset: -1px;
+      border: 1px solid var(--accent);
+      opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    .vista-card:hover .vista-glow { opacity: .3; }
+
+    /* ===== HOJA DE PERSONAJE ===== */
+    .hoja-wrap {
+      position: relative; margin-top: 2rem; cursor: zoom-in;
+    }
+    .hoja-wrap img { width: 100%; display: block; border: 1px solid var(--border); }
+    .hoja-wrap:hover img { filter: brightness(1.05); }
+    .hoja-glow {
+      position: absolute; inset: -1px;
+      border: 1px solid var(--accent);
+      opacity: .25; pointer-events: none;
+      transform: translate(10px, 10px); transition: transform .4s;
+    }
+    .hoja-wrap:hover .hoja-glow { transform: translate(5px, 5px); }
+
+    /* ===== TWO COL LAYOUT ===== */
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 3rem; align-items: start; margin-top: 2.5rem;
+    }
+    .two-col.reverse { direction: rtl; }
+    .two-col.reverse > * { direction: ltr; }
+
+    /* ===== VIDEO PLAYER ===== */
+    .video-player {
+      position: relative; background: #000;
+      border: 1px solid var(--border);
+      overflow: hidden; cursor: pointer;
+    }
+    .video-player video { width: 100%; display: block; object-fit: cover; }
+    .vp-init-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(8,11,16,.55); backdrop-filter: blur(3px);
+      transition: opacity .3s; z-index: 4;
+    }
+    .vp-init-overlay.hidden { opacity: 0; pointer-events: none; }
+    .vp-big-btn {
+      width: 68px; height: 68px; background: none;
+      border: 2px solid var(--accent); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent); transition: all .2s; cursor: pointer;
+    }
+    .vp-big-btn:hover { background: var(--accent); color: var(--bg); transform: scale(1.1); }
+    .vp-controls {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: .5rem .8rem .6rem;
+      background: linear-gradient(transparent, rgba(0,0,0,.85));
+      display: flex; align-items: center; gap: .6rem;
+      z-index: 5; opacity: 0; transition: opacity .25s;
+    }
+    .video-player:hover .vp-controls,
+    .video-player.active .vp-controls { opacity: 1; }
+    .vp-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--accent); padding: 2px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: color .15s, transform .15s;
+    }
+    .vp-btn:hover { color: #fff; transform: scale(1.15); }
+    .vp-btn svg { pointer-events: none; }
+    .vp-progress {
+      flex: 1; position: relative; height: 4px;
+      background: rgba(255,255,255,.2); border-radius: 2px; cursor: pointer;
+    }
+    .vp-progress-fill {
+      position: absolute; top: 0; left: 0;
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px; pointer-events: none; transition: width .1s linear;
+    }
+    .vp-progress-thumb {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 12px; height: 12px; background: var(--accent);
+      border-radius: 50%; margin-left: -6px; pointer-events: none;
+      transition: left .1s linear; box-shadow: 0 0 6px rgba(0,245,196,.6);
+    }
+    .vp-time {
+      font-size: .6rem; letter-spacing: 1px;
+      color: var(--text-muted); white-space: nowrap;
+      flex-shrink: 0; min-width: 72px; text-align: right;
+    }
+    .vp-seek-flash {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      font-family: var(--font-display); font-size: .75rem;
+      letter-spacing: 2px; color: var(--accent);
+      background: rgba(8,11,16,.7); padding: .4rem .9rem;
+      border: 1px solid var(--border); pointer-events: none;
+      opacity: 0; transition: opacity .2s; z-index: 6; white-space: nowrap;
+    }
+    .vp-seek-flash.show { opacity: 1; }
+    .vp-btn.vp-fs { margin-left: auto; }
+    .vp-volume-wrap { display: flex; align-items: center; gap: .4rem; flex-shrink: 0; }
+    .vp-volume-slider {
+      -webkit-appearance: none; appearance: none;
+      width: 60px; height: 3px; border-radius: 2px; cursor: pointer;
+      background: linear-gradient(to right, var(--accent) var(--vol, 100%), rgba(255,255,255,.2) var(--vol, 100%));
+      outline: none; border: none; flex-shrink: 0;
+    }
+    .vp-volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 11px; height: 11px; border-radius: 50%;
+      background: var(--accent); cursor: pointer;
+      box-shadow: 0 0 5px rgba(0,245,196,.6);
+    }
+    .vp-volume-slider::-moz-range-thumb {
+      width: 11px; height: 11px; border-radius: 50%; border: none;
+      background: var(--accent); cursor: pointer;
+    }
+    .video-player:-webkit-full-screen,
+    .video-player:fullscreen {
+      background: #000; width: 100vw !important; height: 100vh !important;
+      display: flex; align-items: center; justify-content: center; cursor: default;
+    }
+    .video-player:-webkit-full-screen video,
+    .video-player:fullscreen video {
+      width: 100vw !important; height: 100vh !important;
+      object-fit: contain !important; max-height: 100vh; cursor: default;
+    }
+    .video-player:-webkit-full-screen .vp-controls,
+    .video-player:fullscreen .vp-controls {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      z-index: 99999; opacity: 1; cursor: default;
+    }
+
+    /* ===== MEDIA CONTAINER ===== */
+    .media-container { position: relative; }
+    .media-label {
+      position: relative; display: inline-block;
+      margin-top: 1rem; left: 0;
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: .6rem;
+      letter-spacing: 2px; padding: .3rem .8rem;
+      text-transform: uppercase; z-index: 10;
+    }
+    .media-glow {
+      position: absolute; inset: -1px;
+      border: 1px solid var(--accent);
+      opacity: .2; pointer-events: none;
+      transform: translate(8px,8px); transition: transform .4s;
+    }
+    .media-container:hover .media-glow { transform: translate(4px,4px); }
+
+    /* ===== INSP LABEL ===== */
+    .insp-label {
+      font-size: .6rem; letter-spacing: 2px;
+      color: var(--text-muted); text-transform: uppercase;
+      margin-top: .9rem; border-left: 2px solid var(--accent);
+      padding-left: .7rem;
+    }
+
+    /* ===== NEXT / BACK ===== */
+    .next-proj {
+      border-top: 1px solid var(--border); padding: 4rem;
+      display: flex; align-items: center; justify-content: space-between;
+      position: relative; z-index: 1;
+    }
+    .next-proj-back, .next-proj-forward {
+      display: flex; align-items: center; gap: 1.5rem;
+      text-decoration: none; padding: 1rem 1.5rem;
+      transition: background .3s; cursor: none;
+    }
+    .next-proj-back:hover, .next-proj-forward:hover { background: var(--bg2); }
+    .next-label { font-size: .65rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; margin-bottom: .5rem; }
+    .next-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--text); transition: color .3s; }
+    .next-proj-back:hover .next-title, .next-proj-forward:hover .next-title { color: var(--accent); }
+    .next-arrow { font-size: 2rem; color: var(--accent); transition: transform .3s; }
+    .next-arrow-left { font-size: 2rem; color: var(--accent); transition: transform .3s; }
+    .next-proj-back:hover .next-arrow-left { transform: translateX(-8px); }
+    .next-proj-forward:hover .next-arrow { transform: translateX(8px); }
+
+    /* ===== LIGHTBOX ===== */
+    .lightbox-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.93);
+      z-index: 9999; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .3s; cursor: zoom-out;
+    }
+    .lightbox-overlay.active { opacity: 1; pointer-events: all; }
+    .lightbox-overlay img {
+      max-width: 92vw; max-height: 90vh; object-fit: contain;
+      border: 1px solid rgba(0,245,196,.3);
+      box-shadow: 0 0 60px rgba(0,245,196,.15);
+    }
+    .lightbox-close {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      background: none; border: 1px solid rgba(0,245,196,.4);
+      color: var(--accent); font-size: 1.2rem;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .2s;
+    }
+    .lightbox-close:hover { background: var(--accent); color: var(--bg); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .proj-hero { padding: 0 1.5rem 4rem; }
+      .proj-scroll-hint { display: none; }
+      .proj-section { padding: 4rem 1.5rem; }
+      .vistas-grid, .vistas-grid.col3, .two-col { grid-template-columns: 1fr; }
+      .next-proj { padding: 1.5rem; flex-direction: column; gap: 1rem; }
+      .next-proj-back, .next-proj-forward { width: 100%; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor"></div>
+  <div class="cursor-trail"></div>
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">SLM<span class="dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html#sobre-mi">Sobre mí</a></li>
+      <li><a href="index.html#habilidades">Skills</a></li>
+      <li><a href="index.html#proyectos">Proyectos</a></li>
+      <li><a href="index.html#contacto">Contacto</a></li>
+    </ul>
+    <div class="nav-status">
+      <span class="status-dot"></span> Open to work
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="proj-hero">
+    <div class="proj-hero-bg"></div>
+    <div class="proj-hero-grid"></div>
+    <div class="proj-hero-visual">
+      <img src="Demonio/Texturafrente.jpg" alt="Demonio — fondo hero" />
+    </div>
+
+    <div class="proj-hero-content">
+      <a href="index.html#proyectos" class="back-link">
+        <span class="arrow">←</span> Volver a proyectos
+      </a>
+      <div class="proj-category">Blender · Substance Painter · 3D · Animación</div>
+      <h1 class="proj-title">
+        DEMONIO
+        <span>MODELO 3D ORIGINAL</span>
+      </h1>
+      <p class="proj-subtitle">
+        Un demonio modelado desde cero en Blender, texturizado en Substance Painter
+        y animado con rigging completo. Desde la hoja de personaje dibujada a mano
+        hasta dos videos finales con escenario, efectos de luz y música.
+      </p>
+      <div class="proj-meta">
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Software</span>
+          <span class="proj-meta-val">Blender · Substance Painter · Premiere Pro</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Tipo</span>
+          <span class="proj-meta-val">Personaje 3D + Animación</span>
+        </div>
+        <div class="proj-meta-item">
+          <span class="proj-meta-label">Estado</span>
+          <span class="proj-meta-val">Completado</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-scroll-hint">
+      <span>scroll</span>
+      <div class="proj-scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ── INTRO ── -->
+  <section class="proj-section reveal">
+    <div class="section-eyebrow">00 // El proyecto</div>
+    <h2 class="prose-title">Un demonio nacido<br><span class="hl">de mis propias manos.</span></h2>
+    <div class="prose">
+      <p>
+        Este proyecto nació como un reto personal: crear un personaje de criatura completo,
+        desde el primer boceto hasta la animación final editada. <strong>Un demonio con patas
+        de cabra, colmillos, lengua de víbora y una presencia que intimide.</strong>
+      </p>
+      <p>
+        El proceso pasó por varias iteraciones — la cabeza evolucionó tres veces hasta
+        encontrar el equilibrio entre monstruo y carácter. Se texturizó en Substance Painter,
+        se le implantaron huesos para animarlo, y finalmente se montaron dos videos en
+        Premiere Pro con escenario, efectos de luz, lluvia y música.
+      </p>
+      <p>
+        El modelado, texturizado y animación siempre representan un gran desafío,
+        pero también una gran oportunidad para seguir mejorando en la creación de
+        personajes y assets para videojuegos.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── HOJA DE PERSONAJE ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">01 // Concepto</div>
+    <h2 class="prose-title reveal">Del papel<br><span class="hl">al modelo.</span></h2>
+
+    <div class="two-col reveal">
+      <div>
+        <div class="prose" style="margin-bottom:1.5rem;">
+          <p>
+            El primer paso fue una <strong>hoja de personaje dibujada a mano</strong>:
+            vista frontal y trasera del demonio. Pero al empezar a modelar noté un problema —
+            las patas tenían una anatomía de cabra que necesitaba una vista lateral específica.
+          </p>
+          <p>
+            Rediseñé la hoja de personaje añadiendo esa vista lateral. Con esa referencia completa
+            podía modelar con precisión cada curva y proporciones del cuerpo.
+          </p>
+        </div>
+        <div class="hoja-wrap" data-img="Demonio/turnaround character.jpg" style="cursor:zoom-in;">
+          <img src="Demonio/turnaround character.jpg" alt="Primera hoja de personaje — turnaround" />
+          <div class="hoja-glow"></div>
+        </div>
+        <div class="insp-label">Primera hoja de personaje — turnaround dibujado a mano</div>
+      </div>
+      <div>
+        <div class="prose" style="margin-bottom:1.5rem;">
+          <p>
+            La hoja de personaje corregida incluye la <strong>vista lateral de las patas</strong>,
+            esencial para entender la anatomía de cabra del demonio. Esta versión fue la referencia
+            definitiva usada durante todo el modelado.
+          </p>
+        </div>
+        <div class="hoja-wrap" data-img="Demonio/hojapersonajecompleta.jpg" style="cursor:zoom-in;">
+          <img src="Demonio/hojapersonajecompleta.jpg" alt="Hoja de personaje completa con vista lateral" />
+          <div class="hoja-glow"></div>
+        </div>
+        <div class="insp-label">Hoja de personaje completa — con vista lateral de patas de cabra</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MODELADO VISTAS ── -->
+  <section class="proj-section">
+    <div class="section-eyebrow">02 // Modelado en Blender</div>
+    <h2 class="prose-title reveal">Cinco ángulos.<br><span class="hl">Un solo</span> <span class="hl2">monstruo.</span></h2>
+
+    <div class="prose reveal" style="margin-bottom:2.5rem;">
+      <p>
+        Con la hoja de personaje como referencia de fondo en Blender, comencé el modelado.
+        Se trabaja cada ángulo por separado — un personaje que solo se ve bien de frente
+        no está terminado. Estas son las cinco vistas del modelo base.
+      </p>
+    </div>
+
+    <div class="vistas-grid reveal">
+      <div class="vista-card" data-img="Demonio/frente1.jpg">
+        <img src="Demonio/frente1.jpg" alt="Demonio — Vista frontal" />
+        <div class="vista-card-label">// Vista frontal</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Demonio/lado1.jpg">
+        <img src="Demonio/lado1.jpg" alt="Demonio — Vista lateral" />
+        <div class="vista-card-label">// Vista lateral</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Demonio/espalda1.jpg">
+        <img src="Demonio/espalda1.jpg" alt="Demonio — Vista espalda" />
+        <div class="vista-card-label">// Vista espalda</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Demonio/diagonal1.jpg">
+        <img src="Demonio/diagonal1.jpg" alt="Demonio — Diagonal frontal" />
+        <div class="vista-card-label">// Diagonal frontal</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Demonio/diagonalespalda1.jpg">
+        <img src="Demonio/diagonalespalda1.jpg" alt="Demonio — Diagonal espalda" />
+        <div class="vista-card-label">// Diagonal espalda</div>
+        <div class="vista-glow"></div>
+      </div>
+    </div>
+
+    <div class="prose reveal" style="margin-top:3rem; margin-bottom:2rem;">
+      <p>
+        Este video muestra el modelo en movimiento — grabado de la pantalla con el celular,
+        muy casero, pero captura el estado del personaje en ese momento del proceso.
+        <strong>Este video no tiene audio.</strong>
+      </p>
+    </div>
+    <div class="reveal" style="max-width:480px; margin:0 auto;">
+      <div class="media-container">
+        <div class="video-player" data-vid="vid-prototipo">
+          <video id="vid-prototipo"
+            src="Demonio/prototipo.mp4"
+            preload="metadata" playsinline muted></video>
+          <div class="vp-init-overlay" id="vpi-prototipo">
+            <button class="vp-big-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+          </div>
+          <div class="vp-seek-flash" id="vsf-prototipo"></div>
+          <div class="vp-controls">
+            <button class="vp-btn" data-action="rewind" title="-10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            </button>
+            <button class="vp-btn" data-action="playpause" title="Play/Pause">
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="vp-btn" data-action="forward" title="+10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+            </button>
+            <div class="vp-progress" data-action="seek">
+              <div class="vp-progress-fill"></div>
+              <div class="vp-progress-thumb"></div>
+            </div>
+            <span class="vp-time">0:00 / 0:00</span>
+            <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="media-label">Modelo base — grabación de pantalla sin audio</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── EVOLUCIÓN DE LA CABEZA ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">03 // Evolución de la cabeza</div>
+    <h2 class="prose-title reveal">No daba miedo.<br><span class="hl">Lo rehíce.</span></h2>
+
+    <div class="prose reveal" style="margin-bottom:2.5rem;">
+      <p>
+        El cuerpo me convencía, pero la cabeza no. No transmitía la amenaza que quería.
+        Me enfoqué en rediseñarla: <strong>lengua salida estilo Venom, colmillos pronunciados,
+        ojos más grandes y expresivos.</strong> Luego fui más lejos — la hice más ancha,
+        con detalles de dragón, más imponente.
+      </p>
+    </div>
+
+    <div class="vistas-grid col3 reveal">
+      <div class="vista-card" data-img="Demonio/cabeza1.jpg">
+        <img src="Demonio/cabeza1.jpg" alt="Cabeza nueva — vista general con lengua y colmillos" />
+        <div class="vista-card-label">// Cabeza nueva — lengua y colmillos</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Demonio/boca1.jpg">
+        <img src="Demonio/boca1.jpg" alt="Primer plano — detalle de la boca" />
+        <div class="vista-card-label">// Primer plano — detalle boca</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Demonio/cabezalado1.jpg">
+        <img src="Demonio/cabezalado1.jpg" alt="Cabeza de lado" />
+        <div class="vista-card-label">// Vista lateral de la cabeza</div>
+        <div class="vista-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TEXTURIZADO ── -->
+  <section class="proj-section">
+    <div class="section-eyebrow">04 // Texturizado en Substance Painter</div>
+    <h2 class="prose-title reveal">De gris<br><span class="hl">a criatura.</span></h2>
+
+    <div class="prose reveal" style="margin-bottom:2.5rem;">
+      <p>
+        Con la cabeza definitiva, pasé a Substance Painter para el texturizado.
+        Selección de colores, capas de pintura, materiales PBR —
+        <strong>el demonio pasó de un modelo gris sin vida a una criatura con presencia real.</strong>
+      </p>
+    </div>
+
+    <div class="vistas-grid reveal">
+      <div class="vista-card" data-img="Demonio/Texturapintando.jpg">
+        <img src="Demonio/Texturapintando.jpg" alt="Texturizado — proceso de pintura" />
+        <div class="vista-card-label">// Proceso de pintura en Substance Painter</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Demonio/Texturafrente.jpg">
+        <img src="Demonio/Texturafrente.jpg" alt="Textura final — vista frontal" />
+        <div class="vista-card-label">// Textura final — frontal</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Demonio/Texturalado.jpg">
+        <img src="Demonio/Texturalado.jpg" alt="Textura final — vista lateral" />
+        <div class="vista-card-label">// Textura final — lateral</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Demonio/Texturaatras.jpg">
+        <img src="Demonio/Texturaatras.jpg" alt="Textura final — vista trasera" />
+        <div class="vista-card-label">// Textura final — trasera</div>
+        <div class="vista-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── RIGGING ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">05 // Rigging y animación</div>
+    <h2 class="prose-title reveal">Le puse huesos.<br><span class="hl">Lo hice</span> <span class="hl2">moverse.</span></h2>
+
+    <div class="prose reveal" style="margin-bottom:2.5rem;">
+      <p>
+        Con el texturizado listo, el siguiente paso fue el rigging: implantarle un esqueleto
+        al demonio para poder animarlo. <strong>Cada hueso controla una parte del cuerpo</strong>
+        — columna, extremidades, cola, mandíbula, lengua. Una vez montado el rig,
+        creé la animación directamente en Blender.
+      </p>
+    </div>
+
+    <div class="vistas-grid col3 reveal">
+      <div class="vista-card" data-img="Demonio/final.png">
+        <img src="Demonio/final.png" alt="Demonio con rig — pose final" />
+        <div class="vista-card-label">// Pose final con rig completo</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Demonio/motion.png">
+        <img src="Demonio/motion.png" alt="Demonio — captura de animación" />
+        <div class="vista-card-label">// Captura de animación</div>
+        <div class="vista-glow"></div>
+      </div>
+      <div class="vista-card" data-img="Demonio/motion2.png">
+        <img src="Demonio/motion2.png" alt="Demonio — segunda captura de animación" />
+        <div class="vista-card-label">// Animación en movimiento</div>
+        <div class="vista-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VIDEO FINAL ESCENARIO ── -->
+  <section class="proj-section">
+    <div class="section-eyebrow">06 // Video final — Escenario</div>
+    <h2 class="prose-title reveal">Lluvia, lava<br><span class="hl">y luz en la boca.</span></h2>
+
+    <div class="prose reveal" style="margin-bottom:2.5rem;">
+      <p>
+        La animación exportada de Blender fue editada en Premiere Pro. Creé un escenario
+        completo: <strong>un río, un puente, lluvia, oscuridad, y una iluminación que viene
+        de la boca del demonio y de flores en el entorno.</strong>
+      </p>
+      <p>
+        La misma escena se muestra dos veces — primero en oscuridad para que los efectos
+        de luz destaquen, luego con iluminación plena para ver todos los colores
+        del texturizado.
+      </p>
+    </div>
+
+    <div class="reveal" style="max-width:900px; margin:0 auto;">
+      <div class="media-container">
+        <div class="video-player" data-vid="vid-final">
+          <video id="vid-final"
+            src="Demonio/FinalDemon.mp4"
+            preload="metadata" playsinline></video>
+          <div class="vp-init-overlay" id="vpi-final">
+            <button class="vp-big-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+          </div>
+          <div class="vp-seek-flash" id="vsf-final"></div>
+          <div class="vp-controls">
+            <button class="vp-btn" data-action="rewind" title="-10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            </button>
+            <button class="vp-btn" data-action="playpause" title="Play/Pause">
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="vp-btn" data-action="forward" title="+10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+            </button>
+            <div class="vp-progress" data-action="seek">
+              <div class="vp-progress-fill"></div>
+              <div class="vp-progress-thumb"></div>
+            </div>
+            <span class="vp-time">0:00 / 0:00</span>
+            <div class="vp-volume-wrap">
+              <button class="vp-btn" data-action="mute" title="Silenciar / Activar sonido">
+                <svg class="icon-vol" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                <svg class="icon-muted" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19l2 2L21 19.73l-18-18zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+              </button>
+              <input type="range" class="vp-volume-slider" data-action="volume" min="0" max="1" step="0.05" value="1" title="Volumen" style="--vol:100%">
+            </div>
+            <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="media-label">FinalDemon — escenario con lluvia, río y efectos de luz</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VIDEO DEMONIATICO ── -->
+  <section class="proj-section proj-section--dark">
+    <div class="section-eyebrow">07 // Video final — Demoníatico</div>
+    <h2 class="prose-title reveal">Luces, oscuridad<br><span class="hl">y baile.</span></h2>
+
+    <div class="prose reveal" style="margin-bottom:2.5rem;">
+      <p>
+        El segundo video va en otra dirección: <strong>fondo oscuro, luces de colores
+        vibrantes, y el demonio haciendo cosas aterradoras... hasta que empieza a bailar
+        con música.</strong> Un contraste entre lo intimidante y lo absurdo que le da
+        personalidad propia al personaje.
+      </p>
+    </div>
+
+    <div class="reveal" style="max-width:900px; margin:0 auto;">
+      <div class="media-container">
+        <div class="video-player" data-vid="vid-demoniatico">
+          <video id="vid-demoniatico"
+            src="Demonio/Demoniatico.mp4"
+            preload="metadata" playsinline></video>
+          <div class="vp-init-overlay" id="vpi-demoniatico">
+            <button class="vp-big-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+          </div>
+          <div class="vp-seek-flash" id="vsf-demoniatico"></div>
+          <div class="vp-controls">
+            <button class="vp-btn" data-action="rewind" title="-10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            </button>
+            <button class="vp-btn" data-action="playpause" title="Play/Pause">
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="vp-btn" data-action="forward" title="+10s">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+            </button>
+            <div class="vp-progress" data-action="seek">
+              <div class="vp-progress-fill"></div>
+              <div class="vp-progress-thumb"></div>
+            </div>
+            <span class="vp-time">0:00 / 0:00</span>
+            <div class="vp-volume-wrap">
+              <button class="vp-btn" data-action="mute" title="Silenciar / Activar sonido">
+                <svg class="icon-vol" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                <svg class="icon-muted" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19l2 2L21 19.73l-18-18zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+              </button>
+              <input type="range" class="vp-volume-slider" data-action="volume" min="0" max="1" step="0.05" value="1" title="Volumen" style="--vol:100%">
+            </div>
+            <button class="vp-btn vp-fs" data-action="fullscreen" title="Pantalla completa">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="media-label">Demoníatico — luces, terror y baile con música</div>
+        <div class="media-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── NAVEGACIÓN ── -->
+  <div class="next-proj">
+    <a href="alyra.html" class="next-proj-back">
+      <span class="next-arrow-left">←</span>
+      <div>
+        <div class="next-label">Proyecto anterior</div>
+        <div class="next-title">Alyra — Personaje 3D</div>
+      </div>
+    </a>
+    <a href="listenmove.html" class="next-proj-forward">
+      <div style="text-align:right;">
+        <div class="next-label">Proyecto siguiente</div>
+        <div class="next-title">ListenMove</div>
+      </div>
+      <span class="next-arrow">→</span>
+    </a>
+  </div>
+
+  <footer class="footer">
+    <span>Santiago Londoño Mendez © 2026</span>
+    <span>Diseñado y codificado por mí.</span>
+  </footer>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox-overlay" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">✕</button>
+    <img id="lightbox-img" src="" alt="" />
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+  /* ===== VIDEO PLAYER ===== */
+  (function initPlayers() {
+    function fmtTime(s) {
+      if (isNaN(s)) return '0:00';
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60).toString().padStart(2, '0');
+      return m + ':' + sec;
+    }
+    function showFlash(flashEl, msg) {
+      if (!flashEl) return;
+      flashEl.textContent = msg;
+      flashEl.classList.add('show');
+      clearTimeout(flashEl._t);
+      flashEl._t = setTimeout(() => flashEl.classList.remove('show'), 700);
+    }
+
+    document.querySelectorAll('.video-player').forEach(function(player) {
+      const video   = player.querySelector('video');
+      const initOv  = player.querySelector('.vp-init-overlay');
+      const flashEl = player.querySelector('.vp-seek-flash');
+      const fill    = player.querySelector('.vp-progress-fill');
+      const thumb   = player.querySelector('.vp-progress-thumb');
+      const timeEl  = player.querySelector('.vp-time');
+      const ppBtn   = player.querySelector('[data-action="playpause"]');
+      const iconPlay  = ppBtn ? ppBtn.querySelector('.icon-play')  : null;
+      const iconPause = ppBtn ? ppBtn.querySelector('.icon-pause') : null;
+      const progBar = player.querySelector('[data-action="seek"]');
+      if (!video) return;
+
+      function syncIcons() {
+        if (!iconPlay || !iconPause) return;
+        iconPlay.style.display  = video.paused ? 'block' : 'none';
+        iconPause.style.display = video.paused ? 'none'  : 'block';
+      }
+      function updateProgress() {
+        if (!video.duration) return;
+        const pct = (video.currentTime / video.duration) * 100;
+        if (fill)  fill.style.width = pct + '%';
+        if (thumb) thumb.style.left = pct + '%';
+        if (timeEl) timeEl.textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
+      }
+
+      if (initOv) {
+        const bigBtn = initOv.querySelector('.vp-big-btn');
+        if (bigBtn) bigBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          video.play().then(function() {
+            initOv.classList.add('hidden');
+            player.classList.add('active');
+            syncIcons();
+          }).catch(console.error);
+        });
+      }
+
+      video.addEventListener('click', function() {
+        if (video.paused) { video.play().then(() => { syncIcons(); player.classList.add('active'); }); }
+        else { video.pause(); syncIcons(); }
+      });
+
+      if (ppBtn) ppBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (video.paused) { video.play().then(() => { syncIcons(); player.classList.add('active'); }); }
+        else { video.pause(); syncIcons(); }
+      });
+
+      /* fullscreen */
+      var fsIconEnter = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+      var fsIconExit  = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+      player.querySelectorAll('[data-action="fullscreen"]').forEach(function(btn) {
+        var btnSvg = btn.querySelector('svg');
+        function updateFsIcon() {
+          var isFs = (document.fullscreenElement === player || document.webkitFullscreenElement === player);
+          if (btnSvg) btnSvg.innerHTML = isFs ? fsIconExit : fsIconEnter;
+        }
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var isFs = (document.fullscreenElement === player || document.webkitFullscreenElement === player);
+          if (isFs) {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          } else {
+            if (player.requestFullscreen) player.requestFullscreen();
+            else if (player.webkitRequestFullscreen) player.webkitRequestFullscreen();
+          }
+        });
+        document.addEventListener('fullscreenchange', updateFsIcon);
+        document.addEventListener('webkitfullscreenchange', updateFsIcon);
+      });
+
+      /* mute / volumen */
+      var muteBtn = player.querySelector('[data-action="mute"]');
+      var volSlider = player.querySelector('[data-action="volume"]');
+      function syncVolIcons() {
+        if (!muteBtn) return;
+        var isMuted = video.muted || video.volume === 0;
+        var iconVol   = muteBtn.querySelector('.icon-vol');
+        var iconMuted = muteBtn.querySelector('.icon-muted');
+        if (iconVol)   iconVol.style.display   = isMuted ? 'none'  : 'block';
+        if (iconMuted) iconMuted.style.display  = isMuted ? 'block' : 'none';
+      }
+      syncVolIcons();
+      if (muteBtn) muteBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        video.muted = !video.muted;
+        if (volSlider) {
+          volSlider.value = video.muted ? 0 : video.volume;
+          volSlider.style.setProperty('--vol', (video.muted ? 0 : video.volume * 100) + '%');
+        }
+        syncVolIcons();
+      });
+      if (volSlider) volSlider.addEventListener('input', function(e) {
+        e.stopPropagation();
+        video.volume = parseFloat(this.value);
+        video.muted  = video.volume === 0;
+        this.style.setProperty('--vol', (video.volume * 100) + '%');
+        syncVolIcons();
+      });
+
+      /* rewind / forward */
+      player.querySelectorAll('[data-action="rewind"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          video.currentTime = Math.max(0, video.currentTime - 10);
+          showFlash(flashEl, '← 10s'); updateProgress();
+        });
+      });
+      player.querySelectorAll('[data-action="forward"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          video.currentTime = Math.min(video.duration || 0, video.currentTime + 10);
+          showFlash(flashEl, '+10s →'); updateProgress();
+        });
+      });
+
+      /* seek */
+      if (progBar) {
+        let seeking = false;
+        function seekTo(e) {
+          const rect = progBar.getBoundingClientRect();
+          const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          video.currentTime = pct * (video.duration || 0);
+          updateProgress();
+        }
+        progBar.addEventListener('mousedown', function(e) { e.stopPropagation(); seeking = true; seekTo(e); });
+        window.addEventListener('mousemove', function(e) { if (seeking) seekTo(e); });
+        window.addEventListener('mouseup', function() { seeking = false; });
+        progBar.addEventListener('touchstart', function(e) { e.stopPropagation(); seeking = true; seekTo(e.touches[0]); }, { passive: true });
+        window.addEventListener('touchmove', function(e) { if (seeking) seekTo(e.touches[0]); }, { passive: true });
+        window.addEventListener('touchend', function() { seeking = false; });
+      }
+
+      video.addEventListener('timeupdate', updateProgress);
+      video.addEventListener('loadedmetadata', updateProgress);
+      video.addEventListener('ended', function() {
+        if (!video.loop) { initOv && initOv.classList.remove('hidden'); syncIcons(); }
+      });
+    });
+  })();
+
+  /* ===== LIGHTBOX ===== */
+  (function initLightbox() {
+    const overlay  = document.getElementById('lightbox');
+    const lbImg    = document.getElementById('lightbox-img');
+    const closeBtn = document.getElementById('lightbox-close');
+    if (!overlay || !lbImg) return;
+
+    function open(src, alt) {
+      lbImg.src = src; lbImg.alt = alt || '';
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function close() {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.vista-card, .hoja-wrap').forEach(function(el) {
+      el.addEventListener('click', function() {
+        const img = el.querySelector('img');
+        const src = el.dataset.img || (img ? img.src : '');
+        if (src) open(src, img ? img.alt : '');
+      });
+    });
+
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay || e.target === lbImg) close();
+    });
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close(); });
+  })();
+  </script>
+</body>
+</html>
