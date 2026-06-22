@@ -656,10 +656,12 @@
       <div class="video-player" id="sat-player">
         <video
           id="sat-video"
-          src="Satelite/satelitevideo.mp4"
           preload="metadata"
           playsinline
-        ></video>
+        >
+          <source src="Satelite/satelitevideo.mp4" type="video/mp4">
+          <source src="https://media.githubusercontent.com/media/SANTIAGOlmF14/portafolio-santiago/main/Satelite/satelitevideo.mp4" type="video/mp4">
+        </video>
 
         <!-- overlay de inicio -->
         <div class="vp-init-overlay" id="sat-init-overlay">
