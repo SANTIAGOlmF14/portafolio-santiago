@@ -456,6 +456,20 @@
         </div>
       </div>
       <div class="proyecto-card reveal" data-delay="1">
+        <div class="proyecto-img" style="position:relative; overflow:hidden; background:#040c14;">
+          <img id="sat-slide-1" src="Satelite/Menu.png" alt="SatelliteCMG — Menú principal"
+            style="width:100%;height:100%;object-fit:cover;object-position:center center;position:absolute;inset:0;opacity:1;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <img id="sat-slide-2" src="Satelite/Simulacion.png" alt="SatelliteCMG — Simulación orbital"
+            style="width:100%;height:100%;object-fit:cover;object-position:center center;position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;will-change:opacity;"/>
+          <div class="proyecto-overlay"><a href="satelite.html" class="proyecto-link">Ver más →</a></div>
+        </div>
+        <div class="proyecto-info">
+          <span class="proyecto-tag">Unity 6 · C# · Simulación Orbital · URP · PC</span>
+          <h3>SatelliteCMG — Simulación Orbital</h3>
+          <p>Aplicativo de simulación orbital para un CubeSat 6U en Unity 6 URP. Física RK4 con perturbaciones J2 y arrastre atmosférico, control de actitud PD y geo-targeting sobre 47 ciudades.</p>
+        </div>
+      </div>
+      <div class="proyecto-card reveal" data-delay="1">
         <div class="proyecto-img" style="position:relative; overflow:hidden; background:#0a0610;">
           <img id="al-slide-1" src="Alyra/LadyConejita.png" alt="Alyra — Referencia"
             style="width:100%;height:100%;object-fit:cover;object-position:center top;position:absolute;inset:0;opacity:1;transition:opacity 1.2s ease;will-change:opacity;"/>
@@ -1093,6 +1107,21 @@ video.addEventListener('ended', function() {
     (function lmSlide() {
       const s1 = document.getElementById('lm-slide-1');
       const s2 = document.getElementById('lm-slide-2');
+      if (!s1 || !s2) return;
+      let showing = 1;
+      setInterval(() => {
+        if (showing === 1) {
+          s1.style.opacity = '0'; s2.style.opacity = '1'; showing = 2;
+        } else {
+          s2.style.opacity = '0'; s1.style.opacity = '1'; showing = 1;
+        }
+      }, 3500);
+    })();
+
+    /* ── SatelliteCMG card slideshow (2 imágenes) ── */
+    (function satSlide() {
+      const s1 = document.getElementById('sat-slide-1');
+      const s2 = document.getElementById('sat-slide-2');
       if (!s1 || !s2) return;
       let showing = 1;
       setInterval(() => {
